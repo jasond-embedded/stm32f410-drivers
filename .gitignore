@@ -1,0 +1,20 @@
+# Dossiers de build
+Debug/
+Release/
+
+# Préférences locales CubeIDE
+.settings/
+
+# Fichiers binaires générés
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.o
+*.d
+*.su
+
+# Fichiers temporaires
+*.bak
+*.tmp
