@@ -14,6 +14,7 @@ Release/
 *.o
 *.d
 *.su
+*.launch
 
 # Fichiers temporaires
 *.bak
