@@ -51,14 +51,15 @@ void test_gpio_reset_pin_led_blink(void) {
         .alternate_function = BSP_GPIO_AF0
     };
 
+    GPIO_Init(GPIOA, 5, &config);
     while(1) {
-        GPIO_Init(GPIOA, 5, &config);
         GPIO_SetPin(GPIOA, 5);
         HAL_Delay(500);
         GPIO_ResetPin(GPIOA, 5);
         HAL_Delay(500);
     }
-
 }
+
+
 
 
