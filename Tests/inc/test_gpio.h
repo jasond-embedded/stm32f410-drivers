@@ -9,5 +9,5 @@
 #define INC_TEST_GPIO_H_
 
 void test_gpio_config_led_blink(void);
-
+void test_gpio_set_pin(void);
 #endif /* INC_TEST_GPIO_H_ */

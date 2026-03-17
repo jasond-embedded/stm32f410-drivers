@@ -86,8 +86,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-
-  test_gpio_config_led_blink();
+  test_gpio_set_pin();
   /* USER CODE END 2 */
 
   /* Infinite loop */
