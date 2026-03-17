@@ -8,7 +8,7 @@
 #include "test_gpio.h"
 #include "gpio.h"
 
-void test_gpio_led_blink(void) {
+void test_gpio_config_led_blink(void) {
     GPIO_Config_t config = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
         .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
@@ -26,3 +26,5 @@ void test_gpio_led_blink(void) {
         HAL_Delay(500);
     }
 }
+
+

@@ -8,6 +8,6 @@
 #ifndef INC_TEST_GPIO_H_
 #define INC_TEST_GPIO_H_
 
-void test_gpio_led_blink(void);
+void test_gpio_config_led_blink(void);
 
 #endif /* INC_TEST_GPIO_H_ */
