@@ -60,6 +60,25 @@ void test_gpio_reset_pin_led_blink(void) {
     }
 }
 
+/* GPIO_Init() function must be validated before testing GPIO_TogglePin() */
+void test_gpio_toogle_pin_led_blink(void) {
+    GPIO_Config_t config = {
+        .mode        = BSP_GPIO_MODE_OUTPUT,
+        .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
+        .speed       = BSP_GPIO_SPEED_LOW,
+        .pull        = BSP_GPIO_PUPD_NONE,
+        .alternate_function = BSP_GPIO_AF0
+    };
+
+	GPIO_Init(GPIOA, 5, &config);
+
+    while(1) {
+    	GPIO_TogglePin(GPIOA, 5);
+    	HAL_Delay(500);
+    	GPIO_TogglePin(GPIOA, 5);
+    	HAL_Delay(500);
+    }
+}
 
 
 
