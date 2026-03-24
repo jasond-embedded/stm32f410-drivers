@@ -89,5 +89,22 @@ GPIO_Status_t GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin) {
     return BSP_GPIO_OK;
 }
 
+GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value) {
+    if (port == NULL)
+        return BSP_GPIO_ERROR;
+    if (pin > 15)
+        return BSP_GPIO_INVALID;
+
+    if ((port->IDR & (0x1 << pin)) != 0) {
+    	*value = 1;
+    }
+    else {
+    	*value = 0;
+    }
+
+    return BSP_GPIO_OK;
+}
+
+
 
 
