@@ -74,7 +74,7 @@ GPIO_Status_t GPIO_ResetPin(GPIO_TypeDef *port, uint8_t pin) {
     if (pin > 15)
         return BSP_GPIO_INVALID;
 
-    port->BSRR = (0x1 << pin + 16);
+    port->BSRR = (0x1 << (pin + 16));
 
     return BSP_GPIO_OK;
 }
