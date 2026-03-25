@@ -96,13 +96,10 @@ GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value) {
         return BSP_GPIO_ERROR;
     if (pin > 15)
         return BSP_GPIO_INVALID;
+    if (value == NULL)
+    	return BSP_GPIO_INVALID;
 
-    if ((port->IDR & (0x1 << pin)) != 0) {
-    	*value = 1;
-    }
-    else {
-    	*value = 0;
-    }
+    *value = (port->IDR >> pin) & 0x1;
 
     return BSP_GPIO_OK;
 }
