@@ -115,10 +115,12 @@ typedef struct {
  * BSP GPIO Function prototypes
  */
 GPIO_Status_t GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Config_t *config);
+GPIO_Status_t GPIO_DeInit(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_SetPin(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_ResetPin(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value);
+
 
 
 #endif /* BSP_GPIO_GPIO_H_ */

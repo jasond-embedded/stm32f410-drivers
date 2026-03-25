@@ -57,6 +57,36 @@ GPIO_Status_t GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Config_t *config) 
     return BSP_GPIO_OK;
 }
 
+GPIO_Status_t GPIO_DeInit(GPIO_TypeDef *port, uint8_t pin) {
+    if (port == NULL)
+        return BSP_GPIO_ERROR;
+    if (pin > 15U)
+        return BSP_GPIO_INVALID;
+
+    /* Reset the IO pin to Input floating mode (as default) */
+    port->MODER &= ~(0x3U << (pin * 2U));
+
+    /* Reset the IO pin to Push-Pull output type (as default) */
+    port->OTYPER &= ~(0x1U << pin);
+
+    /* Reset the IO pin to Low Speed (as default) */
+    port->OSPEEDR &= ~(0x3U << (pin * 2U));
+
+    /* Deactivate the Pull-up and the Pull-down resistor (as default) */
+    port->PUPDR &= ~(0x3U << (pin * 2U));
+
+    /* Reset the Alternate function to AF0 (as default) */
+    if (pin <= 7) {
+    	port->AFR[0] &= ~(0xF << (pin * 4));
+    } else {
+    	port->AFR[1] &= ~(0xF << ((pin - 8) * 4));
+    }
+
+    /* Note: RCC clock is not disabled here as other pins on this port
+     * may still be in use. Disable manually via RCC->AHB1ENR if needed. */
+    return BSP_GPIO_OK;
+}
+
 GPIO_Status_t GPIO_SetPin(GPIO_TypeDef *port, uint8_t pin) {
     if (port == NULL)
         return BSP_GPIO_ERROR;
