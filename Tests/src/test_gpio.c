@@ -208,7 +208,7 @@ void test_gpio_reset_pin_led_blink(void) {
 }
 
 /* GPIO_Init() function must be validated before testing GPIO_TogglePin() */
-void test_gpio_toogle_pin_led_blink(void) {
+void test_gpio_toggle_pin_led_blink(void) {
     GPIO_Config_t config = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
         .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
