@@ -222,8 +222,6 @@ void test_gpio_toogle_pin_led_blink(void) {
     while(1) {
     	GPIO_TogglePin(GPIOA, 5);
     	HAL_Delay(500);
-    	GPIO_TogglePin(GPIOA, 5);
-    	HAL_Delay(500);
     }
 }
 
