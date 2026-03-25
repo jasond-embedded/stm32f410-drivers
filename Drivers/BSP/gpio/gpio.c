@@ -79,15 +79,17 @@ GPIO_Status_t GPIO_ResetPin(GPIO_TypeDef *port, uint8_t pin) {
     return BSP_GPIO_OK;
 }
 
+/* Note : This is not an atomic Toggle, an interrupt can occur during the Read-Modify-Write instructions */
 GPIO_Status_t GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin) {
     if (port == NULL)
         return BSP_GPIO_ERROR;
     if (pin > 15)
         return BSP_GPIO_INVALID;
-    port->ODR ^= (0x1 << pin);
+    port->ODR ^= (0x1 << pin);						/* Non atomic*/
 
     return BSP_GPIO_OK;
 }
+
 
 GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value) {
     if (port == NULL)
