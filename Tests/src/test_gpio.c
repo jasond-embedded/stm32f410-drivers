@@ -166,42 +166,115 @@ void test_gpio_init_nominal(void) {
 	status = GPIO_Init(GPIOA, 8, &config10);
 }
 
-	/*
-	 * Expected register values after GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
-	 *
-	 * config0  -> MODER  bits [11:10] = 0b01  (OUTPUT)
-	 *             OTYPER bit  [5]     = 0b0   (PUSH_PULL)
-	 *             OSPEEDR bits[11:10] = 0b00  (LOW)
-	 *             PUPDR  bits [11:10] = 0b00  (NONE)
-	 *
-	 * config1  -> MODER  bits [11:10] = 0b00  (INPUT)
-	 *             PUPDR  bits [11:10] = 0b00  (NONE)
-	 *
-	 * config2  -> MODER  bits [11:10] = 0b11  (ANALOG)
-	 *
-	 * config3  -> MODER  bits [11:10] = 0b10  (AF)
-	 *             OTYPER bit  [5]     = 0b0   (PUSH_PULL)
-	 *             OSPEEDR bits[11:10] = 0b00  (LOW)
-	 *             AFR[0] bits [23:20] = 0x7   (AF7) for pin 5
-	 *
-	 * config4  -> OTYPER bit  [5]     = 0b1   (OPEN_DRAIN)
-	 *
-	 * config5  -> OSPEEDR bits[11:10] = 0b01  (MEDIUM)
-	 *
-	 * config6  -> OSPEEDR bits[11:10] = 0b10  (HIGH)
-	 *
-	 * config7  -> OSPEEDR bits[11:10] = 0b11  (VERY_HIGH)
-	 *
-	 * config8  -> PUPDR  bits [11:10] = 0b01  (PULL_UP)
-	 *
-	 * config9  -> PUPDR  bits [11:10] = 0b10  (PULL_DOWN)
-	 *
-	 * config10 -> MODER  bits [17:16] = 0b10  (AF)        for pin 8
-	 *             AFR[1] bits [3:0]   = 0x7   (AF7)       for pin 8
-	 */
+/**
+ * @brief  Validate GPIO_Init() error handling and boundary cases
+ *
+ * @note   Debug validation:
+ *           Set breakpoints on each GPIO_Init() call
+ *           Watch variable : status
+ *           All calls must return BSP_GPIO_ERROR or BSP_GPIO_INVALID
+ *           None must return BSP_GPIO_OK
+ *
+ * @note   No hardware setup required — all cases return before
+ *           accessing any register
+ *
+ */
+void test_gpio_init_error_boundary_cases(void) {
+    GPIO_Status_t status;
+
+    GPIO_Config_t valid_config = {
+        .mode               = BSP_GPIO_MODE_OUTPUT,
+        .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
+        .speed              = BSP_GPIO_SPEED_LOW,
+        .pull               = BSP_GPIO_PUPD_NONE,
+        .alternate_function = BSP_GPIO_AF0
+    };
+
+    /* --- BSP_GPIO_ERROR cases --- */
+
+    /* port == NULL -> BSP_GPIO_ERROR */
+    status = GPIO_Init(NULL, 5, &valid_config);
+    /* Expected : BSP_GPIO_ERROR */
+
+    /* --- BSP_GPIO_INVALID cases --- */
+
+    /* pin > 15 -> BSP_GPIO_INVALID */
+    status = GPIO_Init(GPIOA, 16, &valid_config);
+    /* Expected : BSP_GPIO_INVALID */
+
+    /* config == NULL -> BSP_GPIO_INVALID */
+    status = GPIO_Init(GPIOA, 5, NULL);
+    /* Expected : BSP_GPIO_INVALID */
+
+    /* config.mode > 3, out of range -> BSP_GPIO_INVALID */
+    GPIO_Config_t invalid_mode = {
+        .mode               = 0x04,
+        .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
+        .speed              = BSP_GPIO_SPEED_LOW,
+        .pull               = BSP_GPIO_PUPD_NONE,
+        .alternate_function = BSP_GPIO_AF0
+    };
+    status = GPIO_Init(GPIOA, 5, &invalid_mode);
+    /* Expected : BSP_GPIO_INVALID */
+
+    /* config.output_type > 1, out of range -> BSP_GPIO_INVALID */
+    GPIO_Config_t invalid_otype = {
+        .mode               = BSP_GPIO_MODE_OUTPUT,
+        .output_type        = 0x02,
+        .speed              = BSP_GPIO_SPEED_LOW,
+        .pull               = BSP_GPIO_PUPD_NONE,
+        .alternate_function = BSP_GPIO_AF0
+    };
+    status = GPIO_Init(GPIOA, 5, &invalid_otype);
+    /* Expected : BSP_GPIO_INVALID */
+
+    /* config.speed >  out of range -> BSP_GPIO_INVALID */
+    GPIO_Config_t invalid_speed = {
+        .mode               = BSP_GPIO_MODE_OUTPUT,
+        .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
+        .speed              = 0x04,
+        .pull               = BSP_GPIO_PUPD_NONE,
+        .alternate_function = BSP_GPIO_AF0
+    };
+    status = GPIO_Init(GPIOA, 5, &invalid_speed);
+    /* Expected : BSP_GPIO_INVALID */
+
+    /* config.pull out of range -> BSP_GPIO_INVALID */
+    GPIO_Config_t invalid_pull = {
+        .mode               = BSP_GPIO_MODE_OUTPUT,
+        .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
+        .speed              = BSP_GPIO_SPEED_LOW,
+        .pull               = 0x04,
+        .alternate_function = BSP_GPIO_AF0
+    };
+    status = GPIO_Init(GPIOA, 5, &invalid_pull);
+    /* Expected : BSP_GPIO_INVALID */
+
+    /* config.alternate_function out of range -> BSP_GPIO_INVALID */
+    GPIO_Config_t invalid_af = {
+        .mode               = BSP_GPIO_MODE_OUTPUT,
+        .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
+        .speed              = BSP_GPIO_SPEED_LOW,
+        .pull               = BSP_GPIO_PUPD_NONE,
+        .alternate_function = 0x10
+    };
+    status = GPIO_Init(GPIOA, 5, &invalid_af);
+    /* Expected : BSP_GPIO_INVALID */
 }
 
-/* GPIO_Init() function must be validated before testing GPIO_SetPin() */
+/**
+ * @brief  Validate GPIO_SetPin() by setting PA5 (LED) to logical high
+ *
+ * @note   Hardware setup:
+ *           - PA5 : LED output (push-pull, no pull)
+ *             Expected : LED turns on and stays on
+ *
+ * @note   Debug validation:
+ *           Set breakpoint after GPIO_SetPin() call
+ *           Register check : GPIOA->ODR bit [5] = 1
+ *
+ * @note   Dependencies: GPIO_Init() must be validated first
+ */
 void test_gpio_set_pin(void) {
     GPIO_Config_t config = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
@@ -215,7 +288,20 @@ void test_gpio_set_pin(void) {
     GPIO_SetPin(GPIOA, 5);
 }
 
-/* GPIO_Init() and GPIO_SetPin() function must be validated before testing GPIO_ResetPin*/
+/**
+ * @brief  Validate GPIO_ResetPin() by blinking PA5 (LED) using
+ *         GPIO_SetPin() and GPIO_ResetPin() alternately
+ *
+ * @note   Hardware setup:
+ *           - PA5 : LED output (push-pull, no pull)
+ *             Expected : LED blinks at 1Hz (500ms on, 500ms off)
+ *
+ * @note   Debug validation:
+ *           Set breakpoint on GPIO_SetPin() and GPIO_ResetPin() calls
+ *           Register check : GPIOA->ODR bit [5] toggles between 1 and 0
+ *
+ * @note   Dependencies: GPIO_Init() and GPIO_SetPin() must be validated first
+ */
 void test_gpio_reset_pin_led_blink(void) {
     GPIO_Config_t config = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
@@ -252,10 +338,25 @@ void test_gpio_toggle_pin_led_blink(void) {
     }
 }
 
-/* GPIO_Init() and GPIO_SetPin() functions must be validated before testing GPIO_TogglePin().
- * How does the test work ? The value of PA8 is read, if it is 1 (connected to 3v3), then the LED is on.
- * If the value read on PA8 is 0 (not connected to 3v3, but to the pull-down by default (see the config_input), then the LED is off.
- * We can also just watch the value of input_state in debug mode to see if it is well read.
+/**
+ * @brief  Validate GPIO_ReadPin() by reading PA8 state and
+ *         reflecting it on PA5 (LED)
+ *
+ * @note   Hardware setup:
+ *           - PA5 : LED output (push-pull, no pull)
+ *           - PA8 : input (pull-down enabled)
+ *             Connect PA8 to 3V3 to simulate logical 1 -> LED on
+ *             Connect PA8 to GND or leave floating -> LED off
+ *             DO NOT leave PA8 floating without pull-down — undefined state
+ *
+ * @note   Debug validation:
+ *           Set breakpoint on GPIO_ReadPin() call
+ *           Watch variable : input_state
+ *           Expected       : 1 when PA8 connected to 3V3
+ *                            0 when PA8 connected to GND
+ *           Register check : GPIOA->IDR bit [8] must match input_state
+ *
+ * @note   Dependencies: GPIO_Init() and GPIO_SetPin() must be validated first
  */
 void test_gpio_read_pin(void) {
     GPIO_Config_t config_input = {
