@@ -14,6 +14,18 @@ GPIO_Status_t GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Config_t *config) 
     if (pin > 15 || config == NULL)
         return BSP_GPIO_INVALID;
 
+	/* Validate different enums*/
+	if (config->mode > BSP_GPIO_MODE_ANALOG)
+		return BSP_GPIO_INVALID;
+	if (config->output_type > BSP_GPIO_OTYPE_OPEN_DRAIN)
+		return BSP_GPIO_INVALID;
+	if (config->speed > BSP_GPIO_SPEED_VERY_HIGH)
+		return BSP_GPIO_INVALID;
+	if (config->pull > BSP_GPIO_PUPD_RESERVED)
+		return BSP_GPIO_INVALID;
+	if (config->alternate_function > BSP_GPIO_AF15)
+		return BSP_GPIO_INVALID;
+
     /* Enable RCC AHB1 clock to be able to manipulate the GPIOx registers */
     if (port == GPIOA)
         RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
