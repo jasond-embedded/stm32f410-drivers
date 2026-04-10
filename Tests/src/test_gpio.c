@@ -153,17 +153,18 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF7        /* e.g. USART on pin >= 8 */
 	};
 
-	GPIO_Init(GPIOA, 5, &config0);
-	GPIO_Init(GPIOA, 5, &config1);
-	GPIO_Init(GPIOA, 5, &config2);
-	GPIO_Init(GPIOA, 5, &config3);
-	GPIO_Init(GPIOA, 5, &config4);
-	GPIO_Init(GPIOA, 5, &config5);
-	GPIO_Init(GPIOA, 5, &config6);
-	GPIO_Init(GPIOA, 5, &config7);
-	GPIO_Init(GPIOA, 5, &config8);
-	GPIO_Init(GPIOA, 5, &config9);
-	GPIO_Init(GPIOA, 8, &config10);
+	status = GPIO_Init(GPIOA, 5, &config1);
+	status = GPIO_Init(GPIOA, 5, &config0);
+	status = GPIO_Init(GPIOA, 5, &config2);
+	status = GPIO_Init(GPIOA, 5, &config3);
+	status = GPIO_Init(GPIOA, 5, &config4);
+	status = GPIO_Init(GPIOA, 5, &config5);
+	status = GPIO_Init(GPIOA, 5, &config6);
+	status = GPIO_Init(GPIOA, 5, &config7);
+	status = GPIO_Init(GPIOA, 5, &config8);
+	status = GPIO_Init(GPIOA, 5, &config9);
+	status = GPIO_Init(GPIOA, 8, &config10);
+}
 
 	/*
 	 * Expected register values after GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
