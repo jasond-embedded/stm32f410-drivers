@@ -8,7 +8,8 @@
 #ifndef INC_TEST_GPIO_H_
 #define INC_TEST_GPIO_H_
 
-void test_gpio_config(void);
+void test_gpio_init_nominal(void);
+void test_gpio_init_error_boundary_cases(void);
 void test_gpio_set_pin(void);
 void test_gpio_reset_pin_led_blink(void);
 void test_gpio_toogle_pin_led_blink(void);
