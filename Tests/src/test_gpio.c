@@ -387,4 +387,34 @@ void test_gpio_read_pin(void) {
 
 }
 
+/**
+ * @brief  Validate GPIO_DeInit() in nominal cases
+ *
+ * @note  Debug validation :
+ * 			Set breakpoint on GPIO_DeInit()
+ * 			Watch variable : status (status = BSP_GPIO_OK)
+ * 			Watch register values : each port register in SFRs view
+ * 			Expected register values after GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
+ *
+ * 			 config0  -> MODER  bits [11:10] = 0b00  (INPUT)
+ *             			 OTYPER bit  [5]     = 0b0   (PUSH_PULL)
+ *             			 OSPEEDR bits[11:10] = 0b00  (LOW)
+ *             			 PUPDR  bits [11:10] = 0b00  (NONE)
+ *
+ */
+void test_gpio_deinit(void) {
+	GPIO_Status_t status;
+	GPIO_Config_t config0 = {
+	    .mode        = BSP_GPIO_MODE_OUTPUT,
+	    .output_type = BSP_GPIO_OTYPE_OPEN_DRAIN,
+	    .speed       = BSP_GPIO_SPEED_HIGH,
+	    .pull        = BSP_GPIO_PUPD_PULL_DOWN,
+	    .alternate_function = BSP_GPIO_AF0
+	};
+
+	status = GPIO_Init(GPIOA, 5, &config0);
+	status = GPIO_DeInit(GPIOA, 5);
+	__NOP();
+}
+
 
