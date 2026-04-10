@@ -122,5 +122,22 @@ GPIO_Status_t GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value);
 
 
+/* To put later in gpio_it.h*/
+
+typedef enum {
+	BSP_GPIO_IT_NONE    = 0x00,
+    BSP_GPIO_IT_RISING  = 0x01,
+    BSP_GPIO_IT_FALLING = 0x02,
+    BSP_GPIO_IT_BOTH    = 0x03
+} GPIO_IT_Trigger_t;
+
+/**
+ * BSP GPIO EXTI function prototypes
+ */
+
+GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t trigger, uint8_t priority);
+GPIO_Status_t GPIO_IT_Enable(uint8_t pin);
+GPIO_Status_t GPIO_IT_Disable(uint8_t pin);
+void GPIO_IT_Callback(uint8_t pin);
 
 #endif /* BSP_GPIO_GPIO_H_ */
