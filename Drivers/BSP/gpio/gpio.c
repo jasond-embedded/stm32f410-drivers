@@ -147,5 +147,68 @@ GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value) {
 }
 
 
+GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t trigger, uint32_t priority) {
+    if (port == NULL)
+        return BSP_GPIO_ERROR;
+    if (pin > 15)
+        return BSP_GPIO_INVALID;
+    if (priority > 15)
+    	return BSP_GPIO_INVALID;
+    if(trigger > BSP_GPIO_IT_BOTH)
+    	return BSP_GPIO_INVALID;
+
+    /* SYSCFG clock enable */
+    RCC->APB2ENR |= RCC_APB2LPENR_SYSCFGLPEN;
+
+    /* SYSCFG EXTI clock enable */
+    RCC->APB2ENR |= RCC_APB2LPENR_EXTITLPEN;
+
+    uint8_t cr_port_val;
+
+    /* SYSCFG_EXTICRx — mapper port → ligne EXTI */
+    if (port == GPIOA) cr_port_val = 0U;
+    if (port == GPIOB) cr_port_val = 1U;
+    if (port == GPIOC) cr_port_val = 2U;
+    if (port == GPIOH) cr_port_val = 7U;
+
+   uint8_t exti_idx = pin >> 2U; // integer division by 4
+   uint8_t exti_pos = (pin % 4) << 2U; // Do not forget that EXTICR[0] includes EXTI0, EXTI1, EXTI2, EXTI3 (4-bits words)
+   SYSCFG->EXTICR[exti_idx] &= ~(0xFU << exti_pos);
+   SYSCFG->EXTICR[exti_idx] |= (cr_port_val << exti_pos);
+
+    /* EXTI_IMR — activate the line */
+   EXTI->IMR |= (1U << pin);
+
+    /* EXTI_RTSR / FTSR — Configure trigger*/
+   EXTI->RTSR &= ~(1U << pin);
+   EXTI->FTSR &= ~(1U << pin);
+
+   if (trigger == BSP_GPIO_IT_RISING || trigger == BSP_GPIO_IT_BOTH) {
+	   EXTI->RTSR |= (1U << pin);
+   }
+   if (trigger == BSP_GPIO_IT_FALLING || trigger == BSP_GPIO_IT_BOTH) {
+	   EXTI->FTSR |= (1U << pin);
+   }
+   /* If configured as BSP_GPIO_IT_NONE, do nothing since both EXTI_RTSR and EXTI_FTSR were cleared */
+
+    /* NVIC_SetPriority + NVIC_EnableIRQ */
+   IRQn_Type exti_irqn;
+   if      (pin == 0)                      exti_irqn = EXTI0_IRQn;
+   else if (pin == 1)                      exti_irqn = EXTI1_IRQn;
+   else if (pin == 2)                      exti_irqn = EXTI2_IRQn;
+   else if (pin == 3)                      exti_irqn = EXTI3_IRQn;
+   else if (pin == 4)                      exti_irqn = EXTI4_IRQn;
+   else if (pin >= 5  && pin <= 9)         exti_irqn = EXTI9_5_IRQn;
+   else                                    exti_irqn = EXTI15_10_IRQn;
+
+   NVIC_SetPriority(EXTI_IRQn, priority);
+   NVIC_EnableIRQ(EXTI_IRQn);
+
+   return BSP_GPIO_OK;
+}
+
+
+
+
 
 
