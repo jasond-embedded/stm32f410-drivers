@@ -8,8 +8,52 @@
 #include "test_gpio.h"
 #include "gpio.h"
 
+/**
+ * @brief  Validate GPIO_Init() for nominal cases
+ *
+ * @note   Debug validation:
+ *           Set breakpoints on each GPIO_Init() call
+ *           Watch variables : status = BSP_GPIO_OK
+ *           Watch register values : each port register in SFRs view
+ * 			 Expected register values after GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
+ *
+ * 			 config0  -> MODER  bits [11:10] = 0b01  (OUTPUT)
+ *             			 OTYPER bit  [5]     = 0b0   (PUSH_PULL)
+ *             			 OSPEEDR bits[11:10] = 0b00  (LOW)
+ *             			 PUPDR  bits [11:10] = 0b00  (NONE)
+ *
+ * 			 config1  -> MODER  bits [11:10] = 0b00  (INPUT)
+ *            			  PUPDR  bits [11:10] = 0b00  (NONE)
+ *
+ * 			 config2  -> MODER  bits [11:10] = 0b11  (ANALOG)
+ *
+ * 			 config3  -> MODER  bits [11:10] = 0b10  (AF)
+ *             			 OTYPER bit  [5]     = 0b0   (PUSH_PULL)
+ *            			 OSPEEDR bits[11:10] = 0b00  (LOW)
+ *            			 AFR[0] bits [23:20] = 0x7   (AF7) for pin 5
+ *
+ * 			 config4  -> OTYPER bit  [5]     = 0b1   (OPEN_DRAIN)
+ *
+ * 			 config5  -> OSPEEDR bits[11:10] = 0b01  (MEDIUM)
+ *
+ * 			 config6  -> OSPEEDR bits[11:10] = 0b10  (HIGH)
+ *
+ * 			 config7  -> OSPEEDR bits[11:10] = 0b11  (VERY_HIGH)
+ *
+ * 			 config8  -> PUPDR  bits [11:10] = 0b01  (PULL_UP)
+ *
+ * 			 config9  -> PUPDR  bits [11:10] = 0b10  (PULL_DOWN)
+ *
+ * 			 config10 -> MODER  bits [17:16] = 0b10  (AF)        for pin 8
+ *             			 AFR[1] bits [3:0]   = 0x7   (AF7)       for pin 8
 
-void test_gpio_config(void) {
+ *
+ * @note   No hardware setup required — all cases return before
+ *           accessing any register
+ *
+ */
+void test_gpio_init_nominal(void) {
+	GPIO_Status_t status;
 	/* --- MODER --- */
 	/* config0 : OUTPUT - all MODER values covered by configs below */
 	GPIO_Config_t config0 = {
