@@ -146,6 +146,31 @@ GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value) {
     return BSP_GPIO_OK;
 }
 
+GPIO_Status_t GPIO_LockPin(GPIO_TypeDef *port, uint8_t pin) {
+    if (port == NULL)
+        return BSP_GPIO_ERROR;
+    if (pin > 15)
+        return BSP_GPIO_INVALID;
+
+    __IO uint32_t tmp = (0x1UL << 16U) | (0x1UL << pin); // declare it as __IO (volatile) to force the processor not to optimize it and execute each write and read, even if not used.
+
+    /* WR LCKR[16] = ‘1’ + LCKR[15:0] */
+    port->LCKR = tmp;
+
+    /* WR LCKR[16] = ‘0’ + LCKR[15:0] */
+    port->LCKR= (0x1UL << pin);
+
+    /* WR LCKR[16] = ‘1’ + LCKR[15:0] */
+    port->LCKR= tmp;
+
+    tmp = port->LCKR;
+
+    if (port->LCKR & (0x1UL << 16U) == 0x1UL) {
+    	return BSP_GPIO_OK;
+    }
+    else return BSP_GPIO_ERROR;
+}
+
 
 GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t trigger, uint32_t priority) {
     if (port == NULL)

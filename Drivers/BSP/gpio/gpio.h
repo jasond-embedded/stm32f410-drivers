@@ -120,6 +120,7 @@ GPIO_Status_t GPIO_SetPin(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_ResetPin(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin);
 GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value);
+GPIO_Status_t GPIO_LockPin(GPIO_TypeDef *port, uint8_t pin);
 
 
 /* To put later in gpio_it.h*/
