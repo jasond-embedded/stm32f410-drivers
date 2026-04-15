@@ -192,9 +192,9 @@ GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t 
 
     /* SYSCFG_EXTICRx — mapper port → ligne EXTI */
     if (port == GPIOA) cr_port_val = 0U;
-    if (port == GPIOB) cr_port_val = 1U;
-    if (port == GPIOC) cr_port_val = 2U;
-    if (port == GPIOH) cr_port_val = 7U;
+    else if (port == GPIOB) cr_port_val = 1U;
+    else if (port == GPIOH) cr_port_val = 7U;
+    else if (port == GPIOC) cr_port_val = 2U;
     else return BSP_GPIO_INVALID;
 
    uint8_t exti_idx = pin >> 2U; // integer division by 4
