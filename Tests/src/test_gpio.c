@@ -417,4 +417,127 @@ void test_gpio_deinit(void) {
 	__NOP();
 }
 
+/**
+ * @brief  Validate GPIO_IT_Config() nominal cases
+ *
+ * @note   Hardware setup : none required
+ *           All validations are done by reading hardware registers in debug mode
+ *
+ * @note   How to validate — set a breakpoint after each GPIO_IT_Config() call
+ *           and verify the following registers in the SFRs debug view :
+ *
+*           After config0 — GPIOA pin 5, RISING, priority 3 :
+ *             RCC->APB2ENR  bit 14 (SYSCFGEN) = 0x1    — SYSCFG clock enabled
+ *             RCC->APB2ENR  bit 15 (EXTITEN)  = 0x1    — EXTI clock enabled
+ *             SYSCFG->EXTICR[1] bits [7:4]    = 0x0  — pin5 → EXTICR[1], pos (5%4)*4=4 → bits[7:4], GPIOA
+ *             EXTI->RTSR    bit 5             = 0x1  — rising trigger enabled
+ *             EXTI->FTSR    bit 5             = 0x0  — falling trigger disabled
+ *             NVIC->IPR[5]  bits [31:24]      = 0x30 — priority 3 for EXTI9_5_IRQn (IRQn=23)
+ *             NVIC->ISER[0] bit 23            = 0x1  — EXTI9_5_IRQn enabled
+ *
+ *           After config1 — GPIOA pin 5, FALLING, priority 5 :
+ *             EXTI->RTSR    bit 5             = 0x0  — rising trigger disabled
+ *             EXTI->FTSR    bit 5             = 0x1  — falling trigger enabled
+ *             NVIC->IPR[5]  bits [31:24]      = 0x50 — priority updated
+ *
+ *           After config2 — GPIOA pin 5, BOTH, priority 0 :
+ *             EXTI->RTSR    bit 5             = 0x1  — rising trigger enabled
+ *             EXTI->FTSR    bit 5             = 0x1  — falling trigger enabled
+ *             NVIC->IPR[5]  bits [31:24]      = 0x00 — highest priority
+ *
+ *           After config3 — GPIOC pin 13, RISING, priority 10 :
+ *             SYSCFG->EXTICR[3] bits [7:4]    = 0x2  — pin13 → EXTICR[3], pos (13%4)*4=4 → bits[7:4], GPIOC
+ *             EXTI->RTSR    bit 13            = 0x1  — rising trigger enabled
+ *             EXTI->FTSR    bit 13            = 0x0  — falling trigger disabled
+ *             NVIC->IPR[10] bits [7:0]        = 0xA0 — priority 10 for EXTI15_10_IRQn (IRQn=40)
+ *             NVIC->ISER[1] bit 8             = 0x1  — EXTI15_10_IRQn enabled (IRQn=40, 40-32=8)
+ *
+ *           After config4 — GPIOA pin 0, RISING, priority 1 :
+ *             SYSCFG->EXTICR[0] bits [3:0]    = 0x0  — pin0 → EXTICR[0], pos 0, GPIOA
+ *             EXTI->RTSR    bit 0             = 0x1  — rising trigger enabled
+ *             NVIC->IPR[1]  bits [23:16]      = 0x10 — priority 1 for EXTI0_IRQn (IRQn=6)
+ *             NVIC->ISER[0] bit 6             = 0x1  — EXTI0_IRQn enabled
+ *
+ *           After config5 — GPIOA pin 9, FALLING, priority 7 :
+ *             SYSCFG->EXTICR[2] bits [7:4]    = 0x0  — pin9 → EXTICR[2], pos (9%4)*4=4 → bits[7:4], GPIOA
+ *             EXTI->RTSR    bit 9             = 0x0  — rising trigger disabled
+ *             EXTI->FTSR    bit 9             = 0x1  — falling trigger enabled
+ *             NVIC->IPR[5]  bits [31:24]      = 0x70 — priority 7 for EXTI9_5_IRQn (IRQn=23), shared with pin5
+ *             NVIC->ISER[0] bit 23            = 0x1  — EXTI9_5_IRQn enabled
+ *
+ *           After config6 — GPIOH pin 1, RISING, priority 2 :
+ *             SYSCFG->EXTICR[0] bits [7:4]    = 0x7  — pin1 → EXTICR[0], pos (1%4)*4=4 → bits[7:4], GPIOH
+ *             EXTI->RTSR    bit 1             = 0x1  — rising trigger enabled
+ *             NVIC->IPR[1]  bits [31:24]      = 0x20 — priority 2 for EXTI1_IRQn (IRQn=7)
+ *             NVIC->ISER[0] bit 7             = 0x1  — EXTI1_IRQn enabled
+ *
+ * @note   NVIC->IP index and NVIC->ISER bit calculation :
+ *           EXTI0_IRQn     = 6  → ISER[0] bit 6,  IP[6]
+ *           EXTI1_IRQn     = 7  → ISER[0] bit 7,  IP[7]
+ *           EXTI2_IRQn     = 8  → ISER[0] bit 8,  IP[8]
+ *           EXTI3_IRQn     = 9  → ISER[0] bit 9,  IP[9]
+ *           EXTI4_IRQn     = 10 → ISER[0] bit 10, IP[10]
+ *           EXTI9_5_IRQn   = 23 → ISER[0] bit 23, IP[23]
+ *           EXTI15_10_IRQn = 40 → ISER[1] bit 8,  IP[40]
+ *
+ * @note   NVIC->IP priority bits : on STM32F410, __NVIC_PRIO_BITS = 4
+ *           Priority is stored in bits [7:4] of IP[n]
+ *           Value written = priority << (8 - __NVIC_PRIO_BITS) = priority << 4
+ *           Example : priority 3 → IP[n] bits[7:4] = 3 → raw value = 0x30
+ *
+ * @note   Dependencies : none — GPIO_IT_Config() handles all configuration
+ *           including clock enables
+ */
+void test_gpio_it_config_nominal(void) {
+
+    GPIO_Status_t status;
+
+    /* config0 : GPIOA pin 5, RISING trigger, priority 3
+     * Tests : RISING trigger path, EXTI9_5 IRQn group, GPIOA port mapping,
+     *         pin in EXTICR[1] */
+    status = GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_RISING, 3);
+    /* Expected : BSP_GPIO_OK */
+
+    /* config1 : GPIOA pin 5, FALLING trigger, priority 5
+     * Tests : FALLING trigger path, RTSR cleared when switching trigger */
+    status = GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_FALLING, 5);
+    /* Expected : BSP_GPIO_OK */
+
+    /* config2 : GPIOA pin 5, BOTH triggers, priority 0
+     * Tests : BOTH trigger path — RTSR and FTSR both set */
+    status = GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_BOTH, 0);
+    /* Expected : BSP_GPIO_OK */
+
+    /* config3 : GPIOC pin 13, RISING trigger, priority 10
+     * Tests : GPIOC port mapping (cr_port_val = 2),
+     *         EXTI15_10 IRQn group, EXTICR[3] register,
+     *         NVIC->ISER[1] (IRQn >= 32) */
+    status = GPIO_IT_Config(GPIOC, 13, BSP_GPIO_IT_RISING, 10);
+    /* Expected : BSP_GPIO_OK */
+
+    /* config4 : GPIOA pin 0, RISING trigger, priority 1
+     * Tests : EXTI0 IRQn (individual handler), EXTICR[0] register,
+     *         lowest pin boundary */
+    status = GPIO_IT_Config(GPIOA, 0, BSP_GPIO_IT_RISING, 1);
+    /* Expected : BSP_GPIO_OK */
+
+    /* config5 : GPIOA pin 9, FALLING trigger, priority 7
+     * Tests : pin 9 in EXTICR[2], EXTI9_5 IRQn shared with pin 5
+     *         priority update on shared IRQn */
+    status = GPIO_IT_Config(GPIOA, 9, BSP_GPIO_IT_FALLING, 7);
+    /* Expected : BSP_GPIO_OK */
+
+    /* config6 : GPIOH pin 1, RISING trigger, priority 2
+     * Tests : GPIOH port mapping (cr_port_val = 7),
+     *         EXTI1 IRQn, EXTICR[0] bits [7:4] */
+    status = GPIO_IT_Config(GPIOH, 1, BSP_GPIO_IT_RISING, 2);
+    /* Expected : BSP_GPIO_OK */
+
+    /* config7 : GPIOA pin 15, BOTH triggers, priority 15
+     * Tests : highest pin boundary, EXTI15_10 IRQn,
+     *         EXTICR[3] bits [15:12], maximum priority value */
+    status = GPIO_IT_Config(GPIOA, 15, BSP_GPIO_IT_BOTH, 15);
+    /* Expected : BSP_GPIO_OK */
+}
+
 
