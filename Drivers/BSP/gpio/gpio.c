@@ -202,9 +202,6 @@ GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t 
    SYSCFG->EXTICR[exti_idx] &= ~(0xFU << exti_pos);
    SYSCFG->EXTICR[exti_idx] |= (cr_port_val << exti_pos);
 
-    /* EXTI_IMR — activate the line */
-   EXTI->IMR |= (1U << pin);
-
     /* EXTI_RTSR / FTSR — Configure trigger*/
    EXTI->RTSR &= ~(1U << pin);
    EXTI->FTSR &= ~(1U << pin);
