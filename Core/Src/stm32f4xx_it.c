@@ -199,5 +199,7 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /* USER CODE BEGIN 1 */
-
+void EXTI15_10_IRQHandler(void) {
+	GPIO_EXTI_IRQHandler(13);
+}
 /* USER CODE END 1 */

@@ -233,6 +233,51 @@ GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t 
 }
 
 
+GPIO_Status_t GPIO_IT_Enable(uint8_t pin) {
+	if (pin > 15)
+		return BSP_GPIO_INVALID;
+
+    /* EXTI_IMR — activate the line */
+   EXTI->IMR |= (1U << pin);
+
+   return BSP_GPIO_OK;
+}
+
+GPIO_Status_t GPIO_IT_Disable(uint8_t pin) {
+	if (pin > 15)
+		return BSP_GPIO_INVALID;
+
+    /* EXTI_IMR — activate the line */
+   EXTI->IMR &= ~(1U << pin);
+
+   return BSP_GPIO_OK;
+}
+
+GPIO_Status_t GPIO_EXTI_IRQHandler(uint8_t pin) {
+
+	/* EXTI line interrupt detected */
+	if ((EXTI->PR & (1U << pin)) != 0) {
+		EXTI->PR = (1U << pin); // Clear IT
+		GPIO_EXTI_Callback(pin);
+	}
+}
+
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin Specifies the pins connected EXTI line
+  * @retval None
+  */
+__weak void GPIO_EXTI_Callback(uint8_t pin)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(pin);
+  /* NOTE: This function Should not be modified, when the callback is needed,
+           the BSP_GPIO_EXTI_Callback could be implemented in the user file
+   */
+}
+
+
+
 
 
 

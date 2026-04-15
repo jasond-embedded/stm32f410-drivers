@@ -139,6 +139,7 @@ typedef enum {
 GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t trigger, uint32_t priority);
 GPIO_Status_t GPIO_IT_Enable(uint8_t pin);
 GPIO_Status_t GPIO_IT_Disable(uint8_t pin);
-void GPIO_IT_Callback(uint8_t pin);
+GPIO_Status_t GPIO_EXTI_IRQHandler(uint8_t pin);
+void GPIO_EXTI_Callback(uint8_t pin);
 
 #endif /* BSP_GPIO_GPIO_H_ */
