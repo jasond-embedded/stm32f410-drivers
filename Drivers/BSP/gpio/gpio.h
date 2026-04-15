@@ -136,7 +136,7 @@ typedef enum {
  * BSP GPIO EXTI function prototypes
  */
 
-GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t trigger, uint8_t priority);
+GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t trigger, uint32_t priority);
 GPIO_Status_t GPIO_IT_Enable(uint8_t pin);
 GPIO_Status_t GPIO_IT_Disable(uint8_t pin);
 void GPIO_IT_Callback(uint8_t pin);
