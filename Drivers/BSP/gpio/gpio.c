@@ -226,6 +226,8 @@ GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t 
 
    NVIC_SetPriority(exti_irqn, priority);
    NVIC_EnableIRQ(exti_irqn);
+   uint32_t read_back = NVIC_GetPriority(exti_irqn);
+   __NOP();
 
    return BSP_GPIO_OK;
 }
