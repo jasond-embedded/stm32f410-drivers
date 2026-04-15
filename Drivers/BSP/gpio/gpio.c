@@ -195,6 +195,7 @@ GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t 
     if (port == GPIOB) cr_port_val = 1U;
     if (port == GPIOC) cr_port_val = 2U;
     if (port == GPIOH) cr_port_val = 7U;
+    else return BSP_GPIO_INVALID;
 
    uint8_t exti_idx = pin >> 2U; // integer division by 4
    uint8_t exti_pos = (pin % 4) << 2U; // Do not forget that EXTICR[0] includes EXTI0, EXTI1, EXTI2, EXTI3 (4-bits words)
@@ -226,8 +227,8 @@ GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t 
    else if (pin >= 5  && pin <= 9)         exti_irqn = EXTI9_5_IRQn;
    else                                    exti_irqn = EXTI15_10_IRQn;
 
-   NVIC_SetPriority(EXTI_IRQn, priority);
-   NVIC_EnableIRQ(EXTI_IRQn);
+   NVIC_SetPriority(exti_irqn, priority);
+   NVIC_EnableIRQ(exti_irqn);
 
    return BSP_GPIO_OK;
 }
