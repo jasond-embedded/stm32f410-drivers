@@ -185,7 +185,7 @@ GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t 
     /* SYSCFG clock enable */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
-    /* SYSCFG EXTI clock enable */
+    /* EXTI clock enable */
     RCC->APB2ENR |= RCC_APB2ENR_EXTITEN;
 
     uint8_t cr_port_val;
