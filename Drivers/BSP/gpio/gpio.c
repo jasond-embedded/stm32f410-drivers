@@ -11,8 +11,9 @@ BSP_GPIO_Status_t BSP_GPIO_Init(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_Config
 
     if (port == NULL)
         return BSP_GPIO_ERROR;
-    if (pin > 15 || config == NULL)
-        return BSP_GPIO_INVALID;
+    if ((pin > 15) || (config == NULL)) {
+    	return BSP_GPIO_INVALID;
+    }
 
 	/* Validate different enums*/
 	if (config->mode > BSP_GPIO_MODE_ANALOG)
@@ -227,6 +228,7 @@ BSP_GPIO_Status_t BSP_GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_I
    NVIC_SetPriority(exti_irqn, priority);
    NVIC_EnableIRQ(exti_irqn);
    uint32_t read_back = NVIC_GetPriority(exti_irqn);
+   UNUSED(read_back);
    __NOP();
 
    return BSP_GPIO_OK;
@@ -260,6 +262,7 @@ BSP_GPIO_Status_t BSP_GPIO_EXTI_IRQHandler(uint8_t pin) {
 		EXTI->PR = (1U << pin); // Clear IT
 		BSP_GPIO_EXTI_Callback(pin);
 	}
+	return BSP_GPIO_OK;
 }
 
 /**
