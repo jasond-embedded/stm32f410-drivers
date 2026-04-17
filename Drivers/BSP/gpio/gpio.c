@@ -166,7 +166,7 @@ BSP_GPIO_Status_t BSP_GPIO_LockPin(GPIO_TypeDef *port, uint8_t pin) {
 
     tmp = port->LCKR;
 
-    if (port->LCKR & (0x1UL << 16U) == 0x1UL) {
+    if ((port->LCKR & (0x1UL << 16U)) != 0) {
     	return BSP_GPIO_OK;
     }
     else return BSP_GPIO_ERROR;
