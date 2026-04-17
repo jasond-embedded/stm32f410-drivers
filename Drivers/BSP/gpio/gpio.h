@@ -20,7 +20,7 @@ typedef enum {
     BSP_GPIO_MODE_OUTPUT = 0x01,    // MODER = 0b01 - General purpose output
     BSP_GPIO_MODE_AF     = 0x02,    // MODER = 0b10 - Alternate function
     BSP_GPIO_MODE_ANALOG = 0x03     // MODER = 0b11 - Analog mode
-} GPIO_Mode_t;
+} BSP_GPIO_Mode_t;
 
 /*
  * GPIO Output Type (RM0401 - Section 6.4.2 - GPIOx_OTYPER)
@@ -29,7 +29,7 @@ typedef enum {
 typedef enum {
     BSP_GPIO_OTYPE_PUSH_PULL  = 0x00,   // OTYPER = 0 - Output push-pull
     BSP_GPIO_OTYPE_OPEN_DRAIN = 0x01    // OTYPER = 1 - Output open-drain
-} GPIO_OType_t;
+} BSP_GPIO_OType_t;
 
 /*
  * GPIO Output Speed (RM0401 - Section 6.4.3 - GPIOx_OSPEEDR)
@@ -40,7 +40,7 @@ typedef enum {
     BSP_GPIO_SPEED_MEDIUM    = 0x01,    // OSPEEDR = 0b01 - Medium speed (~25 MHz)
     BSP_GPIO_SPEED_HIGH      = 0x02,    // OSPEEDR = 0b10 - High speed (~50 MHz)
     BSP_GPIO_SPEED_VERY_HIGH = 0x03     // OSPEEDR = 0b11 - Very high speed (~100 MHz)
-} GPIO_Speed_t;
+} BSP_GPIO_Speed_t;
 
 /*
  * GPIO Pull-up / Pull-down (RM0401 - Section 6.4.4 - GPIOx_PUPDR)
@@ -51,7 +51,7 @@ typedef enum {
     BSP_GPIO_PUPD_PULL_UP   = 0x01,     // PUPDR = 0b01 - Pull-up
     BSP_GPIO_PUPD_PULL_DOWN = 0x02,     // PUPDR = 0b10 - Pull-down
     BSP_GPIO_PUPD_RESERVED  = 0x03      // PUPDR = 0b11 - Reserved
-} GPIO_PuPd_t;
+} BSP_GPIO_PuPd_t;
 
 /*
  * GPIO Alternate Functions (RM0401 - Section 6.4.9/6.4.10 - GPIOx_AFRL/AFRH)
@@ -85,7 +85,7 @@ typedef enum {
     BSP_GPIO_AF13 = 0x0D,   // (réservé sur STM32F410RB)
     BSP_GPIO_AF14 = 0x0E,   // (réservé sur STM32F410RB)
     BSP_GPIO_AF15 = 0x0F    // EVENTOUT  : Cortex EVENTOUT signal
-} GPIO_AF_t;
+} BSP_GPIO_AF_t;
 
 /*
  * GPIO Status codes - return type for all BSP GPIO functions
@@ -97,30 +97,30 @@ typedef enum {
     BSP_GPIO_BUSY    = 0x03,    // Resource currently in use
     BSP_GPIO_TIMEOUT = 0x04,    // Operation timed out
     BSP_GPIO_NOT_INIT = 0x05    // Pin not initialized before use
-} GPIO_Status_t;
+} BSP_GPIO_Status_t;
 
 /*
  * GPIO Configuration structure
  * Used as parameter for GPIO_Init()
  */
 typedef struct {
-    GPIO_Mode_t     mode;               // Pin mode (input/output/AF/analog)
-    GPIO_OType_t    output_type;        // Output type (push-pull/open-drain)
-    GPIO_Speed_t    speed;              // Output speed
-    GPIO_PuPd_t     pull;               // Pull-up/pull-down configuration
-    GPIO_AF_t       alternate_function; // Alternate function selection (AF mode only)
-} GPIO_Config_t;
+    BSP_GPIO_Mode_t     mode;               // Pin mode (input/output/AF/analog)
+    BSP_GPIO_OType_t    output_type;        // Output type (push-pull/open-drain)
+    BSP_GPIO_Speed_t    speed;              // Output speed
+    BSP_GPIO_PuPd_t     pull;               // Pull-up/pull-down configuration
+    BSP_GPIO_AF_t       alternate_function; // Alternate function selection (AF mode only)
+} BSP_GPIO_Config_t;
 
 /*
  * BSP GPIO Function prototypes
  */
-GPIO_Status_t GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Config_t *config);
-GPIO_Status_t GPIO_DeInit(GPIO_TypeDef *port, uint8_t pin);
-GPIO_Status_t GPIO_SetPin(GPIO_TypeDef *port, uint8_t pin);
-GPIO_Status_t GPIO_ResetPin(GPIO_TypeDef *port, uint8_t pin);
-GPIO_Status_t GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin);
-GPIO_Status_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value);
-GPIO_Status_t GPIO_LockPin(GPIO_TypeDef *port, uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_Init(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_Config_t *config);
+BSP_GPIO_Status_t BSP_GPIO_DeInit(GPIO_TypeDef *port, uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_SetPin(GPIO_TypeDef *port, uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_ResetPin(GPIO_TypeDef *port, uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *value);
+BSP_GPIO_Status_t BSP_GPIO_LockPin(GPIO_TypeDef *port, uint8_t pin);
 
 
 /* To put later in gpio_it.h*/
@@ -130,16 +130,16 @@ typedef enum {
     BSP_GPIO_IT_RISING  = 0x01,
     BSP_GPIO_IT_FALLING = 0x02,
     BSP_GPIO_IT_BOTH    = 0x03
-} GPIO_IT_Trigger_t;
+} BSP_GPIO_IT_Trigger_t;
 
 /**
  * BSP GPIO EXTI function prototypes
  */
 
-GPIO_Status_t GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, GPIO_IT_Trigger_t trigger, uint32_t priority);
-GPIO_Status_t GPIO_IT_Enable(uint8_t pin);
-GPIO_Status_t GPIO_IT_Disable(uint8_t pin);
-GPIO_Status_t GPIO_EXTI_IRQHandler(uint8_t pin);
-void GPIO_EXTI_Callback(uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_IT_Trigger_t trigger, uint32_t priority);
+BSP_GPIO_Status_t BSP_GPIO_IT_Enable(uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_IT_Disable(uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_EXTI_IRQHandler(uint8_t pin);
+void BSP_GPIO_EXTI_Callback(uint8_t pin);
 
 #endif /* BSP_GPIO_GPIO_H_ */

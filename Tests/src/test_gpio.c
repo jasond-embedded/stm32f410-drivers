@@ -9,13 +9,13 @@
 #include "gpio.h"
 
 /**
- * @brief  Validate GPIO_Init() for nominal cases
+ * @brief  Validate BSP_GPIO_Init() for nominal cases
  *
  * @note   Debug validation:
- *           Set breakpoints on each GPIO_Init() call
+ *           Set breakpoints on each BSP_GPIO_Init() call
  *           Watch variables : status = BSP_GPIO_OK
  *           Watch register values : each port register in SFRs view
- * 			 Expected register values after GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
+ * 			 Expected register values after BSP_GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
  *
  * 			 config0  -> MODER  bits [11:10] = 0b01  (OUTPUT)
  *             			 OTYPER bit  [5]     = 0b0   (PUSH_PULL)
@@ -52,11 +52,11 @@
  *           accessing any register
  *
  */
-void test_gpio_init_nominal(void) {
-	GPIO_Status_t status;
+void test_bsp_gpio_init_nominal(void) {
+	BSP_GPIO_Status_t status;
 	/* --- MODER --- */
 	/* config0 : OUTPUT - all MODER values covered by configs below */
-	GPIO_Config_t config0 = {
+	BSP_GPIO_Config_t config0 = {
 	    .mode        = BSP_GPIO_MODE_OUTPUT,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
 	    .speed       = BSP_GPIO_SPEED_LOW,
@@ -64,7 +64,7 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF0
 	};
 
-	GPIO_Config_t config1 = {
+	BSP_GPIO_Config_t config1 = {
 	    .mode        = BSP_GPIO_MODE_INPUT,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,  /* ignored in INPUT mode */
 	    .speed       = BSP_GPIO_SPEED_LOW,         /* ignored in INPUT mode */
@@ -72,7 +72,7 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF0
 	};
 
-	GPIO_Config_t config2 = {
+	BSP_GPIO_Config_t config2 = {
 	    .mode        = BSP_GPIO_MODE_ANALOG,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,  /* ignored in ANALOG mode */
 	    .speed       = BSP_GPIO_SPEED_LOW,         /* ignored in ANALOG mode */
@@ -80,7 +80,7 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF0
 	};
 
-	GPIO_Config_t config3 = {
+	BSP_GPIO_Config_t config3 = {
 	    .mode        = BSP_GPIO_MODE_AF,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
 	    .speed       = BSP_GPIO_SPEED_LOW,
@@ -90,7 +90,7 @@ void test_gpio_init_nominal(void) {
 
 	/* --- OTYPER (OUTPUT and AF modes only) --- */
 	/* config0 already covers PUSH_PULL */
-	GPIO_Config_t config4 = {
+	BSP_GPIO_Config_t config4 = {
 	    .mode        = BSP_GPIO_MODE_OUTPUT,
 	    .output_type = BSP_GPIO_OTYPE_OPEN_DRAIN,
 	    .speed       = BSP_GPIO_SPEED_LOW,
@@ -100,7 +100,7 @@ void test_gpio_init_nominal(void) {
 
 	/* --- OSPEEDR (OUTPUT and AF modes only) --- */
 	/* config0 already covers SPEED_LOW */
-	GPIO_Config_t config5 = {
+	BSP_GPIO_Config_t config5 = {
 	    .mode        = BSP_GPIO_MODE_OUTPUT,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
 	    .speed       = BSP_GPIO_SPEED_MEDIUM,
@@ -108,7 +108,7 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF0
 	};
 
-	GPIO_Config_t config6 = {
+	BSP_GPIO_Config_t config6 = {
 	    .mode        = BSP_GPIO_MODE_OUTPUT,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
 	    .speed       = BSP_GPIO_SPEED_HIGH,
@@ -116,7 +116,7 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF0
 	};
 
-	GPIO_Config_t config7 = {
+	BSP_GPIO_Config_t config7 = {
 	    .mode        = BSP_GPIO_MODE_OUTPUT,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
 	    .speed       = BSP_GPIO_SPEED_VERY_HIGH,
@@ -126,7 +126,7 @@ void test_gpio_init_nominal(void) {
 
 	/* --- PUPDR --- */
 	/* config0 already covers PUPD_NONE */
-	GPIO_Config_t config8 = {
+	BSP_GPIO_Config_t config8 = {
 	    .mode        = BSP_GPIO_MODE_INPUT,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,  /* ignored in INPUT mode */
 	    .speed       = BSP_GPIO_SPEED_LOW,         /* ignored in INPUT mode */
@@ -134,7 +134,7 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF0
 	};
 
-	GPIO_Config_t config9 = {
+	BSP_GPIO_Config_t config9 = {
 	    .mode        = BSP_GPIO_MODE_INPUT,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,  /* ignored in INPUT mode */
 	    .speed       = BSP_GPIO_SPEED_LOW,         /* ignored in INPUT mode */
@@ -145,7 +145,7 @@ void test_gpio_init_nominal(void) {
 	/* --- AFR (AF mode only) --- */
 	/* config3 covers AF on pin <= 7 (AFRL) */
 	/* config10 covers AF on pin >= 8 (AFRH) - same config, different pin */
-	GPIO_Config_t config10 = {
+	BSP_GPIO_Config_t config10 = {
 	    .mode        = BSP_GPIO_MODE_AF,
 	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
 	    .speed       = BSP_GPIO_SPEED_HIGH,
@@ -153,24 +153,24 @@ void test_gpio_init_nominal(void) {
 	    .alternate_function = BSP_GPIO_AF7        /* e.g. USART on pin >= 8 */
 	};
 
-	status = GPIO_Init(GPIOA, 5, &config1);
-	status = GPIO_Init(GPIOA, 5, &config0);
-	status = GPIO_Init(GPIOA, 5, &config2);
-	status = GPIO_Init(GPIOA, 5, &config3);
-	status = GPIO_Init(GPIOA, 5, &config4);
-	status = GPIO_Init(GPIOA, 5, &config5);
-	status = GPIO_Init(GPIOA, 5, &config6);
-	status = GPIO_Init(GPIOA, 5, &config7);
-	status = GPIO_Init(GPIOA, 5, &config8);
-	status = GPIO_Init(GPIOA, 5, &config9);
-	status = GPIO_Init(GPIOA, 8, &config10);
+	status = BSP_GPIO_Init(GPIOA, 5, &config1);
+	status = BSP_GPIO_Init(GPIOA, 5, &config0);
+	status = BSP_GPIO_Init(GPIOA, 5, &config2);
+	status = BSP_GPIO_Init(GPIOA, 5, &config3);
+	status = BSP_GPIO_Init(GPIOA, 5, &config4);
+	status = BSP_GPIO_Init(GPIOA, 5, &config5);
+	status = BSP_GPIO_Init(GPIOA, 5, &config6);
+	status = BSP_GPIO_Init(GPIOA, 5, &config7);
+	status = BSP_GPIO_Init(GPIOA, 5, &config8);
+	status = BSP_GPIO_Init(GPIOA, 5, &config9);
+	status = BSP_GPIO_Init(GPIOA, 8, &config10);
 }
 
 /**
- * @brief  Validate GPIO_Init() error handling and boundary cases
+ * @brief  Validate BSP_GPIO_Init() error handling and boundary cases
  *
  * @note   Debug validation:
- *           Set breakpoints on each GPIO_Init() call
+ *           Set breakpoints on each BSP_GPIO_Init() call
  *           Watch variable : status
  *           All calls must return BSP_GPIO_ERROR or BSP_GPIO_INVALID
  *           None must return BSP_GPIO_OK
@@ -179,10 +179,10 @@ void test_gpio_init_nominal(void) {
  *           accessing any register
  *
  */
-void test_gpio_init_error_boundary_cases(void) {
-    GPIO_Status_t status;
+void test_bsp_gpio_init_error_boundary_cases(void) {
+    BSP_GPIO_Status_t status;
 
-    GPIO_Config_t valid_config = {
+    BSP_GPIO_Config_t valid_config = {
         .mode               = BSP_GPIO_MODE_OUTPUT,
         .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed              = BSP_GPIO_SPEED_LOW,
@@ -193,90 +193,90 @@ void test_gpio_init_error_boundary_cases(void) {
     /* --- BSP_GPIO_ERROR cases --- */
 
     /* port == NULL -> BSP_GPIO_ERROR */
-    status = GPIO_Init(NULL, 5, &valid_config);
+    status = BSP_GPIO_Init(NULL, 5, &valid_config);
     /* Expected : BSP_GPIO_ERROR */
 
     /* --- BSP_GPIO_INVALID cases --- */
 
     /* pin > 15 -> BSP_GPIO_INVALID */
-    status = GPIO_Init(GPIOA, 16, &valid_config);
+    status = BSP_GPIO_Init(GPIOA, 16, &valid_config);
     /* Expected : BSP_GPIO_INVALID */
 
     /* config == NULL -> BSP_GPIO_INVALID */
-    status = GPIO_Init(GPIOA, 5, NULL);
+    status = BSP_GPIO_Init(GPIOA, 5, NULL);
     /* Expected : BSP_GPIO_INVALID */
 
     /* config.mode > 3, out of range -> BSP_GPIO_INVALID */
-    GPIO_Config_t invalid_mode = {
+    BSP_GPIO_Config_t invalid_mode = {
         .mode               = 0x04,
         .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed              = BSP_GPIO_SPEED_LOW,
         .pull               = BSP_GPIO_PUPD_NONE,
         .alternate_function = BSP_GPIO_AF0
     };
-    status = GPIO_Init(GPIOA, 5, &invalid_mode);
+    status = BSP_GPIO_Init(GPIOA, 5, &invalid_mode);
     /* Expected : BSP_GPIO_INVALID */
 
     /* config.output_type > 1, out of range -> BSP_GPIO_INVALID */
-    GPIO_Config_t invalid_otype = {
+    BSP_GPIO_Config_t invalid_otype = {
         .mode               = BSP_GPIO_MODE_OUTPUT,
         .output_type        = 0x02,
         .speed              = BSP_GPIO_SPEED_LOW,
         .pull               = BSP_GPIO_PUPD_NONE,
         .alternate_function = BSP_GPIO_AF0
     };
-    status = GPIO_Init(GPIOA, 5, &invalid_otype);
+    status = BSP_GPIO_Init(GPIOA, 5, &invalid_otype);
     /* Expected : BSP_GPIO_INVALID */
 
     /* config.speed >  out of range -> BSP_GPIO_INVALID */
-    GPIO_Config_t invalid_speed = {
+    BSP_GPIO_Config_t invalid_speed = {
         .mode               = BSP_GPIO_MODE_OUTPUT,
         .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed              = 0x04,
         .pull               = BSP_GPIO_PUPD_NONE,
         .alternate_function = BSP_GPIO_AF0
     };
-    status = GPIO_Init(GPIOA, 5, &invalid_speed);
+    status = BSP_GPIO_Init(GPIOA, 5, &invalid_speed);
     /* Expected : BSP_GPIO_INVALID */
 
     /* config.pull out of range -> BSP_GPIO_INVALID */
-    GPIO_Config_t invalid_pull = {
+    BSP_GPIO_Config_t invalid_pull = {
         .mode               = BSP_GPIO_MODE_OUTPUT,
         .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed              = BSP_GPIO_SPEED_LOW,
         .pull               = 0x04,
         .alternate_function = BSP_GPIO_AF0
     };
-    status = GPIO_Init(GPIOA, 5, &invalid_pull);
+    status = BSP_GPIO_Init(GPIOA, 5, &invalid_pull);
     /* Expected : BSP_GPIO_INVALID */
 
     /* config.alternate_function out of range -> BSP_GPIO_INVALID */
-    GPIO_Config_t invalid_af = {
+    BSP_GPIO_Config_t invalid_af = {
         .mode               = BSP_GPIO_MODE_OUTPUT,
         .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed              = BSP_GPIO_SPEED_LOW,
         .pull               = BSP_GPIO_PUPD_NONE,
         .alternate_function = 0x10
     };
-    status = GPIO_Init(GPIOA, 5, &invalid_af);
+    status = BSP_GPIO_Init(GPIOA, 5, &invalid_af);
     /* Expected : BSP_GPIO_INVALID */
 }
 
 /**
- * @brief  Validate GPIO_SetPin() by setting PA5 (LED) to logical high
+ * @brief  Validate BSP_GPIO_SetPin() by setting PA5 (LED) to logical high
  *
  * @note   Hardware setup:
  *           - PA5 : LED output (push-pull, no pull)
  *             Expected : LED turns on and stays on
  *
  * @note   Debug validation:
- *           Set breakpoint after GPIO_SetPin() call
+ *           Set breakpoint after BSP_GPIO_SetPin() call
  *           Register check : GPIOA->ODR bit [5] = 1
  *
- * @note   Dependencies: GPIO_Init() must be validated first
+ * @note   Dependencies: BSP_GPIO_Init() must be validated first
  */
-void test_gpio_set_pin(void) {
-    GPIO_Config_t config = {
+void test_bsp_gpio_set_pin(void) {
+    BSP_GPIO_Config_t config = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
         .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed       = BSP_GPIO_SPEED_LOW,
@@ -284,26 +284,26 @@ void test_gpio_set_pin(void) {
         .alternate_function = BSP_GPIO_AF0
     };
 
-    GPIO_Init(GPIOA, 5, &config);
-    GPIO_SetPin(GPIOA, 5);
+    BSP_GPIO_Init(GPIOA, 5, &config);
+    BSP_GPIO_SetPin(GPIOA, 5);
 }
 
 /**
- * @brief  Validate GPIO_ResetPin() by blinking PA5 (LED) using
- *         GPIO_SetPin() and GPIO_ResetPin() alternately
+ * @brief  Validate BSP_GPIO_ResetPin() by blinking PA5 (LED) using
+ *         BSP_GPIO_SetPin() and BSP_GPIO_ResetPin() alternately
  *
  * @note   Hardware setup:
  *           - PA5 : LED output (push-pull, no pull)
  *             Expected : LED blinks at 1Hz (500ms on, 500ms off)
  *
  * @note   Debug validation:
- *           Set breakpoint on GPIO_SetPin() and GPIO_ResetPin() calls
+ *           Set breakpoint on BSP_GPIO_SetPin() and BSP_GPIO_ResetPin() calls
  *           Register check : GPIOA->ODR bit [5] toggles between 1 and 0
  *
- * @note   Dependencies: GPIO_Init() and GPIO_SetPin() must be validated first
+ * @note   Dependencies: BSP_GPIO_Init() and BSP_GPIO_SetPin() must be validated first
  */
-void test_gpio_reset_pin_led_blink(void) {
-    GPIO_Config_t config = {
+void test_bsp_gpio_reset_pin_led_blink(void) {
+    BSP_GPIO_Config_t config = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
         .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed       = BSP_GPIO_SPEED_LOW,
@@ -311,18 +311,18 @@ void test_gpio_reset_pin_led_blink(void) {
         .alternate_function = BSP_GPIO_AF0
     };
 
-    GPIO_Init(GPIOA, 5, &config);
+    BSP_GPIO_Init(GPIOA, 5, &config);
     while(1) {
-        GPIO_SetPin(GPIOA, 5);
+        BSP_GPIO_SetPin(GPIOA, 5);
         HAL_Delay(500);
-        GPIO_ResetPin(GPIOA, 5);
+        BSP_GPIO_ResetPin(GPIOA, 5);
         HAL_Delay(500);
     }
 }
 
-/* GPIO_Init() function must be validated before testing GPIO_TogglePin() */
-void test_gpio_toggle_pin_led_blink(void) {
-    GPIO_Config_t config = {
+/* BSP_GPIO_Init() function must be validated before testing BSP_GPIO_TogglePin() */
+void test_bsp_gpio_toggle_pin_led_blink(void) {
+    BSP_GPIO_Config_t config = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
         .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed       = BSP_GPIO_SPEED_LOW,
@@ -330,16 +330,16 @@ void test_gpio_toggle_pin_led_blink(void) {
         .alternate_function = BSP_GPIO_AF0
     };
 
-	GPIO_Init(GPIOA, 5, &config);
+	BSP_GPIO_Init(GPIOA, 5, &config);
 
     while(1) {
-    	GPIO_TogglePin(GPIOA, 5);
+    	BSP_GPIO_TogglePin(GPIOA, 5);
     	HAL_Delay(500);
     }
 }
 
 /**
- * @brief  Validate GPIO_ReadPin() by reading PA8 state and
+ * @brief  Validate BSP_GPIO_ReadPin() by reading PA8 state and
  *         reflecting it on PA5 (LED)
  *
  * @note   Hardware setup:
@@ -350,21 +350,21 @@ void test_gpio_toggle_pin_led_blink(void) {
  *             DO NOT leave PA8 floating without pull-down — undefined state
  *
  * @note   Debug validation:
- *           Set breakpoint on GPIO_ReadPin() call
+ *           Set breakpoint on BSP_GPIO_ReadPin() call
  *           Watch variable : input_state
  *           Expected       : 1 when PA8 connected to 3V3
  *                            0 when PA8 connected to GND
  *           Register check : GPIOA->IDR bit [8] must match input_state
  *
- * @note   Dependencies: GPIO_Init() and GPIO_SetPin() must be validated first
+ * @note   Dependencies: BSP_GPIO_Init() and BSP_GPIO_SetPin() must be validated first
  */
-void test_gpio_read_pin(void) {
-    GPIO_Config_t config_input = {
+void test_bsp_gpio_read_pin(void) {
+    BSP_GPIO_Config_t config_input = {
         .mode        = BSP_GPIO_MODE_INPUT,
         .pull        = BSP_GPIO_PUPD_PULL_DOWN,
     };
 
-    GPIO_Config_t config_output = {
+    BSP_GPIO_Config_t config_output = {
         .mode        = BSP_GPIO_MODE_OUTPUT,
         .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
         .speed       = BSP_GPIO_SPEED_LOW,
@@ -372,29 +372,29 @@ void test_gpio_read_pin(void) {
         .alternate_function = BSP_GPIO_AF0
     };
 
-	GPIO_Init(GPIOA, 5, &config_output);
-	GPIO_Init(GPIOA, 8, &config_input);
+	BSP_GPIO_Init(GPIOA, 5, &config_output);
+	BSP_GPIO_Init(GPIOA, 8, &config_input);
 	uint8_t input_state = 0;
 	while(1) {
-		GPIO_ReadPin(GPIOA, 8, &input_state);
+		BSP_GPIO_ReadPin(GPIOA, 8, &input_state);
 		if (input_state == 1) {
-			GPIO_SetPin(GPIOA, 5);
+			BSP_GPIO_SetPin(GPIOA, 5);
 		}
 		else {
-			GPIO_ResetPin(GPIOA, 5);
+			BSP_GPIO_ResetPin(GPIOA, 5);
 		}
 	}
 
 }
 
 /**
- * @brief  Validate GPIO_DeInit() in nominal cases
+ * @brief  Validate BSP_GPIO_DeInit() in nominal cases
  *
  * @note  Debug validation :
- * 			Set breakpoint on GPIO_DeInit()
+ * 			Set breakpoint on BSP_GPIO_DeInit()
  * 			Watch variable : status (status = BSP_GPIO_OK)
  * 			Watch register values : each port register in SFRs view
- * 			Expected register values after GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
+ * 			Expected register values after BSP_GPIO_Init() call (for GPIOA 5 pin and GPIOA 8)
  *
  * 			 config0  -> MODER  bits [11:10] = 0b00  (INPUT)
  *             			 OTYPER bit  [5]     = 0b0   (PUSH_PULL)
@@ -402,9 +402,9 @@ void test_gpio_read_pin(void) {
  *             			 PUPDR  bits [11:10] = 0b00  (NONE)
  *
  */
-void test_gpio_deinit(void) {
-	GPIO_Status_t status;
-	GPIO_Config_t config0 = {
+void test_bsp_gpio_deinit(void) {
+	BSP_GPIO_Status_t status;
+	BSP_GPIO_Config_t config0 = {
 	    .mode        = BSP_GPIO_MODE_OUTPUT,
 	    .output_type = BSP_GPIO_OTYPE_OPEN_DRAIN,
 	    .speed       = BSP_GPIO_SPEED_HIGH,
@@ -412,18 +412,18 @@ void test_gpio_deinit(void) {
 	    .alternate_function = BSP_GPIO_AF0
 	};
 
-	status = GPIO_Init(GPIOA, 5, &config0);
-	status = GPIO_DeInit(GPIOA, 5);
+	status = BSP_GPIO_Init(GPIOA, 5, &config0);
+	status = BSP_GPIO_DeInit(GPIOA, 5);
 	__NOP();
 }
 
 /**
- * @brief  Validate GPIO_IT_Config() nominal cases
+ * @brief  Validate BSP_GPIO_IT_Config() nominal cases
  *
  * @note   Hardware setup : none required
  *           All validations are done by reading hardware registers in debug mode
  *
- * @note   How to validate — set a breakpoint after each GPIO_IT_Config() call
+ * @note   How to validate — set a breakpoint after each BSP_GPIO_IT_Config() call
  *           and verify the following registers in the SFRs debug view :
  *
 *           After config0 — GPIOA pin 5, RISING, priority 3 :
@@ -485,58 +485,58 @@ void test_gpio_deinit(void) {
  *           Value written = priority << (8 - __NVIC_PRIO_BITS) = priority << 4
  *           Example : priority 3 → IP[n] bits[7:4] = 3 → raw value = 0x30
  *
- * @note   Dependencies : none — GPIO_IT_Config() handles all configuration
+ * @note   Dependencies : none — BSP_GPIO_IT_Config() handles all configuration
  *           including clock enables
  */
-void test_gpio_it_config_nominal(void) {
+void test_bsp_gpio_it_config_nominal(void) {
 
-    GPIO_Status_t status;
+    BSP_GPIO_Status_t status;
 
     /* config0 : GPIOA pin 5, RISING trigger, priority 3
      * Tests : RISING trigger path, EXTI9_5 IRQn group, GPIOA port mapping,
      *         pin in EXTICR[1] */
-    status = GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_RISING, 3);
+    status = BSP_GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_RISING, 3);
     /* Expected : BSP_GPIO_OK */
 
     /* config1 : GPIOA pin 5, FALLING trigger, priority 5
      * Tests : FALLING trigger path, RTSR cleared when switching trigger */
-    status = GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_FALLING, 5);
+    status = BSP_GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_FALLING, 5);
     /* Expected : BSP_GPIO_OK */
 
     /* config2 : GPIOA pin 5, BOTH triggers, priority 0
      * Tests : BOTH trigger path — RTSR and FTSR both set */
-    status = GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_BOTH, 0);
+    status = BSP_GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_BOTH, 0);
     /* Expected : BSP_GPIO_OK */
 
     /* config3 : GPIOC pin 13, RISING trigger, priority 10
      * Tests : GPIOC port mapping (cr_port_val = 2),
      *         EXTI15_10 IRQn group, EXTICR[3] register,
      *         NVIC->ISER[1] (IRQn >= 32) */
-    status = GPIO_IT_Config(GPIOC, 13, BSP_GPIO_IT_RISING, 10);
+    status = BSP_GPIO_IT_Config(GPIOC, 13, BSP_GPIO_IT_RISING, 10);
     /* Expected : BSP_GPIO_OK */
 
     /* config4 : GPIOA pin 0, RISING trigger, priority 1
      * Tests : EXTI0 IRQn (individual handler), EXTICR[0] register,
      *         lowest pin boundary */
-    status = GPIO_IT_Config(GPIOA, 0, BSP_GPIO_IT_RISING, 1);
+    status = BSP_GPIO_IT_Config(GPIOA, 0, BSP_GPIO_IT_RISING, 1);
     /* Expected : BSP_GPIO_OK */
 
     /* config5 : GPIOA pin 9, FALLING trigger, priority 7
      * Tests : pin 9 in EXTICR[2], EXTI9_5 IRQn shared with pin 5
      *         priority update on shared IRQn */
-    status = GPIO_IT_Config(GPIOA, 9, BSP_GPIO_IT_FALLING, 7);
+    status = BSP_GPIO_IT_Config(GPIOA, 9, BSP_GPIO_IT_FALLING, 7);
     /* Expected : BSP_GPIO_OK */
 
     /* config6 : GPIOH pin 1, RISING trigger, priority 2
      * Tests : GPIOH port mapping (cr_port_val = 7),
      *         EXTI1 IRQn, EXTICR[0] bits [7:4] */
-    status = GPIO_IT_Config(GPIOH, 1, BSP_GPIO_IT_RISING, 2);
+    status = BSP_GPIO_IT_Config(GPIOH, 1, BSP_GPIO_IT_RISING, 2);
     /* Expected : BSP_GPIO_OK */
 
     /* config7 : GPIOA pin 15, BOTH triggers, priority 15
      * Tests : highest pin boundary, EXTI15_10 IRQn,
      *         EXTICR[3] bits [15:12], maximum priority value */
-    status = GPIO_IT_Config(GPIOA, 15, BSP_GPIO_IT_BOTH, 15);
+    status = BSP_GPIO_IT_Config(GPIOA, 15, BSP_GPIO_IT_BOTH, 15);
     /* Expected : BSP_GPIO_OK */
 }
 
