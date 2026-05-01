@@ -418,12 +418,12 @@ void test_bsp_gpio_deinit(void) {
 }
 
 /**
- * @brief  Validate BSP_GPIO_IT_Config() nominal cases
+ * @brief  Validate BSP_GPIO_EXTI_Config() nominal cases
  *
  * @note   Hardware setup : none required
  *           All validations are done by reading hardware registers in debug mode
  *
- * @note   How to validate — set a breakpoint after each BSP_GPIO_IT_Config() call
+ * @note   How to validate — set a breakpoint after each BSP_GPIO_EXTI_Config() call
  *           and verify the following registers in the SFRs debug view :
  *
 *           After config0 — GPIOA pin 5, RISING, priority 3 :
@@ -485,7 +485,7 @@ void test_bsp_gpio_deinit(void) {
  *           Value written = priority << (8 - __NVIC_PRIO_BITS) = priority << 4
  *           Example : priority 3 → IP[n] bits[7:4] = 3 → raw value = 0x30
  *
- * @note   Dependencies : none — BSP_GPIO_IT_Config() handles all configuration
+ * @note   Dependencies : none — BSP_GPIO_EXTI_Config() handles all configuration
  *           including clock enables
  */
 void test_bsp_gpio_it_config_nominal(void) {
@@ -495,48 +495,48 @@ void test_bsp_gpio_it_config_nominal(void) {
     /* config0 : GPIOA pin 5, RISING trigger, priority 3
      * Tests : RISING trigger path, EXTI9_5 IRQn group, GPIOA port mapping,
      *         pin in EXTICR[1] */
-    status = BSP_GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_RISING, 3);
+    status = BSP_GPIO_EXTI_Config(GPIOA, 5, BSP_GPIO_IT_RISING, 3);
     /* Expected : BSP_GPIO_OK */
 
     /* config1 : GPIOA pin 5, FALLING trigger, priority 5
      * Tests : FALLING trigger path, RTSR cleared when switching trigger */
-    status = BSP_GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_FALLING, 5);
+    status = BSP_GPIO_EXTI_Config(GPIOA, 5, BSP_GPIO_IT_FALLING, 5);
     /* Expected : BSP_GPIO_OK */
 
     /* config2 : GPIOA pin 5, BOTH triggers, priority 0
      * Tests : BOTH trigger path — RTSR and FTSR both set */
-    status = BSP_GPIO_IT_Config(GPIOA, 5, BSP_GPIO_IT_BOTH, 0);
+    status = BSP_GPIO_EXTI_Config(GPIOA, 5, BSP_GPIO_IT_BOTH, 0);
     /* Expected : BSP_GPIO_OK */
 
     /* config3 : GPIOC pin 13, RISING trigger, priority 10
      * Tests : GPIOC port mapping (cr_port_val = 2),
      *         EXTI15_10 IRQn group, EXTICR[3] register,
      *         NVIC->ISER[1] (IRQn >= 32) */
-    status = BSP_GPIO_IT_Config(GPIOC, 13, BSP_GPIO_IT_RISING, 10);
+    status = BSP_GPIO_EXTI_Config(GPIOC, 13, BSP_GPIO_IT_RISING, 10);
     /* Expected : BSP_GPIO_OK */
 
     /* config4 : GPIOA pin 0, RISING trigger, priority 1
      * Tests : EXTI0 IRQn (individual handler), EXTICR[0] register,
      *         lowest pin boundary */
-    status = BSP_GPIO_IT_Config(GPIOA, 0, BSP_GPIO_IT_RISING, 1);
+    status = BSP_GPIO_EXTI_Config(GPIOA, 0, BSP_GPIO_IT_RISING, 1);
     /* Expected : BSP_GPIO_OK */
 
     /* config5 : GPIOA pin 9, FALLING trigger, priority 7
      * Tests : pin 9 in EXTICR[2], EXTI9_5 IRQn shared with pin 5
      *         priority update on shared IRQn */
-    status = BSP_GPIO_IT_Config(GPIOA, 9, BSP_GPIO_IT_FALLING, 7);
+    status = BSP_GPIO_EXTI_Config(GPIOA, 9, BSP_GPIO_IT_FALLING, 7);
     /* Expected : BSP_GPIO_OK */
 
     /* config6 : GPIOH pin 1, RISING trigger, priority 2
      * Tests : GPIOH port mapping (cr_port_val = 7),
      *         EXTI1 IRQn, EXTICR[0] bits [7:4] */
-    status = BSP_GPIO_IT_Config(GPIOH, 1, BSP_GPIO_IT_RISING, 2);
+    status = BSP_GPIO_EXTI_Config(GPIOH, 1, BSP_GPIO_IT_RISING, 2);
     /* Expected : BSP_GPIO_OK */
 
     /* config7 : GPIOA pin 15, BOTH triggers, priority 15
      * Tests : highest pin boundary, EXTI15_10 IRQn,
      *         EXTICR[3] bits [15:12], maximum priority value */
-    status = BSP_GPIO_IT_Config(GPIOA, 15, BSP_GPIO_IT_BOTH, 15);
+    status = BSP_GPIO_EXTI_Config(GPIOA, 15, BSP_GPIO_IT_BOTH, 15);
     /* Expected : BSP_GPIO_OK */
 }
 

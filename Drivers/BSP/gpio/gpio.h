@@ -136,9 +136,9 @@ typedef enum {
  * BSP GPIO EXTI function prototypes
  */
 
-BSP_GPIO_Status_t BSP_GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_IT_Trigger_t trigger, uint32_t priority);
-BSP_GPIO_Status_t BSP_GPIO_IT_Enable(uint8_t pin);
-BSP_GPIO_Status_t BSP_GPIO_IT_Disable(uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_EXTI_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_IT_Trigger_t trigger, uint32_t priority);
+BSP_GPIO_Status_t BSP_GPIO_EXTI_Enable(uint8_t pin);
+BSP_GPIO_Status_t BSP_GPIO_EXTI_Disable(uint8_t pin);
 BSP_GPIO_Status_t BSP_GPIO_EXTI_IRQHandler(uint8_t pin);
 void BSP_GPIO_EXTI_Callback(uint8_t pin);
 

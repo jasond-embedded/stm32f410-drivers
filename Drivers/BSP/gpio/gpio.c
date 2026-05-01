@@ -173,7 +173,7 @@ BSP_GPIO_Status_t BSP_GPIO_LockPin(GPIO_TypeDef *port, uint8_t pin) {
 }
 
 
-BSP_GPIO_Status_t BSP_GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_IT_Trigger_t trigger, uint32_t priority) {
+BSP_GPIO_Status_t BSP_GPIO_EXTI_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_IT_Trigger_t trigger, uint32_t priority) {
     if (port == NULL)
         return BSP_GPIO_ERROR;
     if (pin > 15)
@@ -235,7 +235,7 @@ BSP_GPIO_Status_t BSP_GPIO_IT_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_I
 }
 
 
-BSP_GPIO_Status_t BSP_GPIO_IT_Enable(uint8_t pin) {
+BSP_GPIO_Status_t BSP_GPIO_EXTI_Enable(uint8_t pin) {
 	if (pin > 15)
 		return BSP_GPIO_INVALID;
 
@@ -245,7 +245,7 @@ BSP_GPIO_Status_t BSP_GPIO_IT_Enable(uint8_t pin) {
    return BSP_GPIO_OK;
 }
 
-BSP_GPIO_Status_t BSP_GPIO_IT_Disable(uint8_t pin) {
+BSP_GPIO_Status_t BSP_GPIO_EXTI_Disable(uint8_t pin) {
 	if (pin > 15)
 		return BSP_GPIO_INVALID;
 
