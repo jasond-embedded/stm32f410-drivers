@@ -200,6 +200,11 @@ void SysTick_Handler(void)
 
 /* USER CODE BEGIN 1 */
 void EXTI15_10_IRQHandler(void) {
-	GPIO_EXTI_IRQHandler(13);
+	for (uint8_t pin = 10; pin <= 15; pin++) {
+		if (EXTI->PR & (1U << pin)) {
+			BSP_GPIO_EXTI_IRQHandler(pin);
+		}
+	}
+
 }
 /* USER CODE END 1 */
