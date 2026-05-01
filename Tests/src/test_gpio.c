@@ -54,6 +54,7 @@
  */
 void test_bsp_gpio_init_nominal(void) {
 	BSP_GPIO_Status_t status;
+	UNUSED(status);
 	/* --- MODER --- */
 	/* config0 : OUTPUT - all MODER values covered by configs below */
 	BSP_GPIO_Config_t config0 = {
@@ -181,7 +182,7 @@ void test_bsp_gpio_init_nominal(void) {
  */
 void test_bsp_gpio_init_error_boundary_cases(void) {
     BSP_GPIO_Status_t status;
-
+    UNUSED(status);
     BSP_GPIO_Config_t valid_config = {
         .mode               = BSP_GPIO_MODE_OUTPUT,
         .output_type        = BSP_GPIO_OTYPE_PUSH_PULL,
@@ -404,6 +405,7 @@ void test_bsp_gpio_read_pin(void) {
  */
 void test_bsp_gpio_deinit(void) {
 	BSP_GPIO_Status_t status;
+	UNUSED(status);
 	BSP_GPIO_Config_t config0 = {
 	    .mode        = BSP_GPIO_MODE_OUTPUT,
 	    .output_type = BSP_GPIO_OTYPE_OPEN_DRAIN,
@@ -491,7 +493,7 @@ void test_bsp_gpio_deinit(void) {
 void test_bsp_gpio_it_config_nominal(void) {
 
     BSP_GPIO_Status_t status;
-
+    UNUSED(status);
     /* config0 : GPIOA pin 5, RISING trigger, priority 3
      * Tests : RISING trigger path, EXTI9_5 IRQn group, GPIOA port mapping,
      *         pin in EXTICR[1] */
