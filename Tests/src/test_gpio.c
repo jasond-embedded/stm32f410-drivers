@@ -542,4 +542,49 @@ void test_bsp_gpio_it_config_nominal(void) {
     /* Expected : BSP_GPIO_OK */
 }
 
+static volatile uint8_t tag = 0;
+
+void BSP_GPIO_EXTI_Callback(uint8_t pin) {
+	if (tag == 0) tag = 1;
+	else tag = 0;
+}
+void test_bsp_exti(void) {
+
+
+	BSP_GPIO_Config_t config_led = {
+	    .mode        = BSP_GPIO_MODE_OUTPUT,
+	    .output_type = BSP_GPIO_OTYPE_PUSH_PULL,
+	    .speed       = BSP_GPIO_SPEED_LOW,
+	    .pull        = BSP_GPIO_PUPD_NONE,
+	    .alternate_function = BSP_GPIO_AF0
+	};
+
+	BSP_GPIO_Init(GPIOA, 5, &config_led);
+
+	BSP_GPIO_Config_t config_btn = {
+		.mode        = BSP_GPIO_MODE_INPUT,
+		.output_type = BSP_GPIO_OTYPE_PUSH_PULL,  /* ignored in INPUT mode */
+		.speed       = BSP_GPIO_SPEED_LOW,         /* ignored in INPUT mode */
+		.pull        = BSP_GPIO_PUPD_NONE,
+		.alternate_function = BSP_GPIO_AF0
+	};
+	BSP_GPIO_Init(GPIOC, 13, &config_btn);
+	BSP_GPIO_EXTI_Config(GPIOC, 13, BSP_GPIO_IT_RISING, 0);
+	BSP_GPIO_EXTI_Enable(13);
+
+	while (1) {
+		if (tag == 1) {
+			BSP_GPIO_TogglePin(GPIOA, 5);
+			HAL_Delay(500);
+		}
+		else {
+			BSP_GPIO_ResetPin(GPIOA, 5);
+		}
+	}
+}
+
+
+
+
+
 

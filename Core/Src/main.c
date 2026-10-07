@@ -86,9 +86,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  test_gpio_it_config_nominal();
-//  test_gpio_read_pin();
-  test_gpio_config();
+//  test_bsp_gpio_it_config_nominal();
+//  test_bsp_gpio_read_pin();
+//  test_bsp_gpio_config();
+  test_bsp_exti();
   /* USER CODE END 2 */
 
   /* Infinite loop */

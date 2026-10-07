@@ -16,4 +16,5 @@ void test_bsp_gpio_toggle_pin_led_blink(void);
 void test_bsp_gpio_read_pin(void);
 void test_bsp_gpio_deinit(void);
 void test_bsp_gpio_it_config_nominal(void);
+void test_bsp_exti(void);
 #endif /* INC_TEST_GPIO_H_ */
