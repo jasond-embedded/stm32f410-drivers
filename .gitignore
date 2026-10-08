@@ -23,6 +23,7 @@ temp_test/
 
 #Fichiers de compilation
 build
+build.log
 
 #Fichiers de récupération
 .backup/

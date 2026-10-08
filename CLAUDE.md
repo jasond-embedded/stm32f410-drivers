@@ -75,3 +75,12 @@ Contenu : actions effectuées, propositions, décisions, améliorations possible
 - `/test`   → tests Unity host-side + cppcheck MISRA  
 - `/flash`  → flash STM32_Programmer_CLI (confirmation requise)
 - `/report` → rapport de session
+
+## Outils de build (Windows)
+- make : utiliser UNIQUEMENT celui de CubeIDE (chemin dans .claude/commands/build.md).
+  Le make MSYS2 du PATH casse la compilation (TMP/TEMP mal transmis à gcc).
+- Le chemin contient la version du plugin CubeIDE (ex. make.win32_2.2.0.202409170845) :
+  il est À METTRE À JOUR après chaque mise à jour de CubeIDE.
+  Localiser le nouveau : `find /c/ST -name make.exe`, puis modifier build.md.
+- Si make.exe est introuvable au chemin indiqué : s'arrêter et prévenir l'utilisateur,
+  ne jamais se rabattre sur un autre make.
