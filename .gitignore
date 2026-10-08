@@ -19,3 +19,10 @@ Release/
 # Fichiers temporaires
 *.bak
 *.tmp
+temp_test/
+
+#Fichiers de compilation
+build
+
+#Fichiers de récupération
+.backup/

@@ -1,0 +1,68 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Bash(gcc*)",
+      "Bash(cppcheck*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(echo*)",
+      "Bash(cat*)",
+      "Bash(ls*)",
+      "Bash(find*)"
+    ],
+    "deny": [
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git checkout*)",
+      "Bash(git branch*)",
+      "Bash(git merge*)",
+      "Bash(git rebase*)",
+      "Bash(git reset*)",
+      "Bash(git stash*)",
+      "Bash(rm*)",
+      "Bash(sudo*)",
+      "Write(Drivers/CMSIS/**)",
+      "Write(Drivers/STM32F4xx_HAL_Driver/**)",
+      "Write(vendor/**)",
+      "Write(CLAUDE.md)",
+      "Write(.claude/settings.json)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-write-cppcheck.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); if [ \"$(echo \"$INPUT\" | jq -r '.stop_hook_active')\" = \"true\" ]; then exit 0; fi; echo 'Session terminée. Penser à : 1) Commiter si travail validé 2) Mettre à jour état actuel dans CLAUDE.md si driver terminé' >&2; exit 0"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Contexte compacté. Rappel : BSP STM32F410 bare-metal, MISRA-C:2012, sans HAL ST. Driver en cours : UART. Lire CLAUDE.md pour les règles complètes.'"
+          }
+        ]
+      }
+    ]
+  }
+}
