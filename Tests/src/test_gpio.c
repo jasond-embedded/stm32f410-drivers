@@ -545,6 +545,7 @@ void test_bsp_gpio_it_config_nominal(void) {
 static volatile uint8_t tag = 0;
 
 void BSP_GPIO_EXTI_Callback(uint8_t pin) {
+	UNUSED(pin);
 	if (tag == 0) tag = 1;
 	else tag = 0;
 }
