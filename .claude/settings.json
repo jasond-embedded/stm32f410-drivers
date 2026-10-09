@@ -8,10 +8,7 @@
       "Bash(git diff*)",
       "Bash(git log*)",
       "Bash(git show*)",
-      "Bash(echo*)",
-      "Bash(cat*)",
-      "Bash(ls*)",
-      "Bash(find*)"
+      "Bash(ls*)"
     ],
     "deny": [
       "Bash(git commit*)",
@@ -24,11 +21,11 @@
       "Bash(git stash*)",
       "Bash(rm*)",
       "Bash(sudo*)",
-      "Write(Drivers/CMSIS/**)",
-      "Write(Drivers/STM32F4xx_HAL_Driver/**)",
-      "Write(vendor/**)",
-      "Write(CLAUDE.md)",
-      "Write(.claude/settings.json)"
+      "Edit(Drivers/CMSIS/**)",
+	  "Edit(Drivers/STM32F4xx_HAL_Driver/**)",
+	  "Edit(vendor/**)",
+	  "Edit(CLAUDE.md)",
+	  "Edit(.claude/settings.json)"
     ]
   },
   "hooks": {
