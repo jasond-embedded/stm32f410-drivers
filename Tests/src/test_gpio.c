@@ -1,8 +1,14 @@
-/*
- * test_gpio.c
+/**
+ * @file    test_gpio.c
+ * @brief   On-target tests for the BSP GPIO driver.
  *
- *  Created on: Mar 13, 2026
- *      Author: DANGUIAT
+ * @details Covers nominal configuration of every register field, error and
+ *          boundary cases, set/reset/toggle/read, de-initialisation and EXTI
+ *          configuration. Expected register values and hardware setup are
+ *          documented in the header of each test function.
+ *
+ * @note    Some tests contain an infinite loop (LED blink, input mirror):
+ *          run them one at a time.
  */
 
 #include "test_gpio.h"

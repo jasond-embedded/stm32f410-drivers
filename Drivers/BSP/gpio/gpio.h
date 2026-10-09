@@ -1,8 +1,16 @@
-/*
- * gpio.h
+/**
+ * @file    gpio.h
+ * @brief   Register-level GPIO driver for the STM32F410RB - public API.
  *
- *  Created on: Mar 13, 2026
- *      Author: DANGUIAT
+ * @details Configuration of GPIO pins (mode, output type, speed, pull-up/
+ *          pull-down, alternate function), atomic set/reset through BSRR,
+ *          pin read, configuration lock (LCKR) and external interrupts
+ *          (SYSCFG + EXTI + NVIC).
+ *          No dependency on the ST HAL: only the CMSIS device header
+ *          is used for register definitions.
+ *
+ * @see     RM0401 Rev4, section 6 (GPIO), section 7 (SYSCFG), section 9 (EXTI)
+ * @see     DS11144, table 9 (alternate function mapping)
  */
 
 #ifndef BSP_GPIO_GPIO_H_

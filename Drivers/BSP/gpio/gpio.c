@@ -1,8 +1,16 @@
-/*
- * gpio.c
+/**
+ * @file    gpio.c
+ * @brief   Register-level GPIO driver for the STM32F410RB - implementation.
  *
- *  Created on: Mar 13, 2026
- *      Author: DANGUIAT
+ * @details Every public function validates its parameters before any
+ *          register access and returns a BSP_GPIO_Status_t code.
+ *          Register fields are always cleared before being set.
+ *          BSP_GPIO_TogglePin() uses a non-atomic read-modify-write on ODR
+ *          (documented limitation).
+ *          BSP_GPIO_EXTI_Callback() is weak and must be overridden by the
+ *          application.
+ *
+ * @see     RM0401 Rev4, sections 6.4, 7.2, 9.3
  */
 
 #include "gpio.h"

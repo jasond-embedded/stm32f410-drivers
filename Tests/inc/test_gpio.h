@@ -1,8 +1,10 @@
-/*
- * test_gpio.h
+/**
+ * @file    test_gpio.h
+ * @brief   On-target test functions for the BSP GPIO driver.
  *
- *  Created on: Mar 13, 2026
- *      Author: DANGUIAT
+ * @details Each test is called from main() and validated on the
+ *          NUCLEO-F410RB, either visually (LED LD2 on PA5) or by inspecting
+ *          registers in the debugger SFR view.
  */
 
 #ifndef INC_TEST_GPIO_H_
