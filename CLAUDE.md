@@ -84,3 +84,12 @@ Contenu : actions effectuées, propositions, décisions, améliorations possible
   Localiser le nouveau : `find /c/ST -name make.exe`, puis modifier build.md.
 - Si make.exe est introuvable au chemin indiqué : s'arrêter et prévenir l'utilisateur,
   ne jamais se rabattre sur un autre make.
+  
+  ## Contexte et état du dépôt
+- Décisions et état courant : docs/project_context.md. Le lire en début de session,
+  avant de proposer une décision qui pourrait déjà avoir été prise.
+- L'utilisateur fait lui-même les commits et les changements de branche.
+  Ne jamais supposer l'état du dépôt : lancer `git status` et `git log --oneline -10`
+  avant toute réponse qui en dépend.
+- En fin de session, proposer la mise à jour de docs/project_context.md
+  (décisions prises, points ouverts réglés).
