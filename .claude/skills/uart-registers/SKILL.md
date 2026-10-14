@@ -160,7 +160,7 @@ usart->SR = ~USART_SR_TC;
 /* Clear des flags d'erreur (ORE, NF, FE, PE, IDLE) — séquence obligatoire */
 uint32_t sr = usart->SR;               /* 1. lecture SR (capture les flags) */
 (void)usart->DR;                       /* 2. lecture DR */
-if ((sr & USART_SR_ORE) != 0UL) { /* ... */ }
+if ((sr & USART_SR_ORE) != 0U) { /* ... */ }
 ```
 
 ## DR — Data Register (RM0401 Section 24.6.2)
@@ -173,9 +173,9 @@ bit de parité en TX ; en RX le MSB lu est le bit de parité reçu
 ```
 
 ```c
-usart->DR = (uint32_t)data & 0xFFUL;               /* 8 bits */
-uint8_t rx = (uint8_t)(usart->DR & 0xFFUL);        /* 8 bits */
-/* 9 bits (M=1, PCE=0) : masque 0x1FFUL */
+usart->DR = (uint32_t)data & 0xFFU;               /* 8 bits */
+uint8_t rx = (uint8_t)(usart->DR & 0xFFU);        /* 8 bits */
+/* 9 bits (M=1, PCE=0) : masque 0x1FFU */
 ```
 
 ## BRR — Baud Rate Register (RM0401 Section 24.6.3)
@@ -269,20 +269,20 @@ Après TE=1 : délai d'1 bit, puis envoi d'une trame idle
 ```c
 for (i = 0U; i < size; i++) {
     /* attendre TDR vide — avec timeout (HAL_GetTick ou compteur) */
-    while ((usart->SR & USART_SR_TXE) == 0UL) { /* timeout → BSP_UART_TIMEOUT */ }
+    while ((usart->SR & USART_SR_TXE) == 0U) { /* timeout → BSP_UART_TIMEOUT */ }
     usart->DR = (uint32_t)pData[i];
 }
 /* attendre la fin physique du dernier octet avant de rendre la main */
-while ((usart->SR & USART_SR_TC) == 0UL) { /* timeout */ }
+while ((usart->SR & USART_SR_TC) == 0U) { /* timeout */ }
 ```
 
 ## Pattern RX polling
 
 ```c
-while ((usart->SR & USART_SR_RXNE) == 0UL) { /* timeout → BSP_UART_TIMEOUT */ }
+while ((usart->SR & USART_SR_RXNE) == 0U) { /* timeout → BSP_UART_TIMEOUT */ }
 sr = usart->SR;                            /* capturer les erreurs AVANT DR */
-pData[i] = (uint8_t)(usart->DR & 0xFFUL);  /* clear RXNE (+ flags erreur) */
-if ((sr & (USART_SR_ORE | USART_SR_NF | USART_SR_FE | USART_SR_PE)) != 0UL) { /* ErrorCode */ }
+pData[i] = (uint8_t)(usart->DR & 0xFFU);  /* clear RXNE (+ flags erreur) */
+if ((sr & (USART_SR_ORE | USART_SR_NF | USART_SR_FE | USART_SR_PE)) != 0U) { /* ErrorCode */ }
 ```
 
 ## Pattern TX par interruption (TXEIE + TCIE)
@@ -292,7 +292,7 @@ if ((sr & (USART_SR_ORE | USART_SR_NF | USART_SR_FE | USART_SR_PE)) != 0UL) { /*
 usart->CR1 |= USART_CR1_TXEIE;
 
 /* ISR — TXE */
-if (((sr & USART_SR_TXE) != 0UL) && ((cr1 & USART_CR1_TXEIE) != 0UL)) {
+if (((sr & USART_SR_TXE) != 0U) && ((cr1 & USART_CR1_TXEIE) != 0U)) {
     if (tx_count > 0U) {
         usart->DR = (uint32_t)*p_tx++;
         tx_count--;
@@ -302,7 +302,7 @@ if (((sr & USART_SR_TXE) != 0UL) && ((cr1 & USART_CR1_TXEIE) != 0UL)) {
     }
 }
 /* ISR — TC */
-if (((sr & USART_SR_TC) != 0UL) && ((cr1 & USART_CR1_TCIE) != 0UL)) {
+if (((sr & USART_SR_TC) != 0U) && ((cr1 & USART_CR1_TCIE) != 0U)) {
     usart->CR1 &= ~USART_CR1_TCIE;
     /* TxState = IDLE → BSP_UART_TxCpltCallback() */
 }
@@ -315,8 +315,8 @@ if (((sr & USART_SR_TC) != 0UL) && ((cr1 & USART_CR1_TCIE) != 0UL)) {
 usart->CR1 |= USART_CR1_RXNEIE | USART_CR1_PEIE;
 
 /* ISR — RXNE ou ORE (RXNEIE déclenche aussi sur ORE) */
-if (((sr & (USART_SR_RXNE | USART_SR_ORE)) != 0UL) && ((cr1 & USART_CR1_RXNEIE) != 0UL)) {
-    uint8_t byte = (uint8_t)(usart->DR & 0xFFUL);  /* lecture DR : clear RXNE ET ORE */
+if (((sr & (USART_SR_RXNE | USART_SR_ORE)) != 0U) && ((cr1 & USART_CR1_RXNEIE) != 0U)) {
+    uint8_t byte = (uint8_t)(usart->DR & 0xFFU);  /* lecture DR : clear RXNE ET ORE */
     /* ORE non clearé → l'IRQ se redéclenche en boucle */
     if (rx_count > 0U) { *p_rx++ = byte; rx_count--; }
     if (rx_count == 0U) {

@@ -11,7 +11,7 @@ qu'un point ouvert est réglé.
 
 | Élément | État |
 |---|---|
-| Driver GPIO | Implémenté et testé sur carte. Revue `reviewer` faite le 2026-10-13 : corrections à faire (section 5). |
+| Driver GPIO | Implémenté et testé sur carte. Revue `reviewer` faite le 2026-10-13 : corrections à faire (section 6). |
 | Driver UART | Esquisse non commitée dans `Drivers/BSP/uart/` (uart.h complet, uart.c vide). |
 | Configuration Claude Code | Terminée : CLAUDE.md, settings, hooks, skills, commandes, agents. |
 | README | Publié sur `develop`. |
@@ -85,7 +85,29 @@ qu'un point ouvert est réglé.
 
 ---
 
-## 5. Revue de BSP_GPIO_Init() — 2026-10-13
+## 5. Conventions de code BSP — décisions
+
+Règles complètes : skill `bsp-conventions`.
+
+- **Suffixe `U`, jamais `UL`, et cast `(uint32_t)` sur l'opérande gauche
+  des décalages** (décidé le 2026-10-14) : `(uint32_t)0x3U << (pin * 2U)`.
+  Masques et comparaisons hors décalage : `U` seul (`& 0xFFU`, `!= 0U`).
+  - Pourquoi pas `UL` : sur Cortex-M4, `unsigned int` et `unsigned long`
+    font tous deux 32 bits, mais sur les tests host-side, `unsigned long`
+    fait 64 bits sous Linux/macOS (LP64) et 32 bits sous Windows (LLP64).
+  - Pourquoi le cast : Rule 12.2 (amplitude < largeur du type *essentiel*
+    de l'opérande gauche). Un littéral `U` est essentiellement du plus petit
+    type qui le contient (`0x3U` → unsigned char, 8 bits), donc
+    `0x3U << 30` est non conforme. `(uint32_t)0x3U` est conforme et donne
+    un décalage 32 bits sur la cible et sur tous les hôtes.
+  - Les macros CMSIS (définies en `UL`) s'utilisent telles quelles :
+    U et UL sont tous deux essentiellement non signés (Rule 10.4).
+  Remplace l'ancienne convention `UL` des skills `bsp-conventions`,
+  `gpio-registers`, `uart-registers` et de l'agent `reviewer`.
+
+---
+
+## 6. Revue de BSP_GPIO_Init() — 2026-10-13
 
 **Constats retenus**
 - **B1 (bloquant)** : décalages sur des `int` signés (`0x3 << 30`,
@@ -124,7 +146,7 @@ docs: record MISRA-C:2012 deviations
 
 ---
 
-## 6. Driver UART — décisions de conception (uart.h)
+## 7. Driver UART — décisions de conception (uart.h)
 
 - `BSP_UART_Handle_t` : instance, copie de la configuration, état global,
   `TxState`/`RxState` indépendants et `volatile` (full-duplex), `ErrorCode`
@@ -146,9 +168,9 @@ docs: record MISRA-C:2012 deviations
 
 ---
 
-## 7. Points ouverts
+## 8. Points ouverts
 
-- Vérifier que la skill `uart-registers` est alignée avec la section 6
+- Vérifier que la skill `uart-registers` est alignée avec la section 7
   (nom `s_apb_presc_shift`, méthode d'effacement de TC).
 - `main.c` : le bouton B1 (PC13, actif bas, pull-up externe sur la carte)
   est configuré en `PULL_DOWN` + front montant. Vérifier le montage réel.

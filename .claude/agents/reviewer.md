@@ -42,7 +42,10 @@ Check every item and report only real findings.
    - Shared state between ISR and main context declared `volatile`;
      read-modify-write races identified
 3. **MISRA-C:2012 conventions** (see bsp-conventions)
-   - `UL` suffix on masks, `U` on shift amounts, enums cast before shifting
+   - `U` suffix (never `UL`) on literals and shift amounts; the left operand
+     of a shift is cast to `uint32_t`, literals included
+     (`(uint32_t)0x3U << n`, Rule 12.2: `0x3U` is essentially unsigned char)
+     and enums; CMSIS macros (defined in `UL`) are used as-is
    - No implicit function declaration (Rule 17.3), no `//` comments
    - Deviations (e.g. Rule 15.5 multiple returns) documented
 4. **Documentation**

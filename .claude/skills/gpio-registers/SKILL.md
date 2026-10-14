@@ -63,7 +63,7 @@ Position : bits (2*pin+1):(2*pin) — 2 bits par pin
 ```
 
 ```c
-port->MODER &= ~(0x3UL << (pin * 2U));
+port->MODER &= ~((uint32_t)0x3U << (pin * 2U));
 port->MODER |=  ((uint32_t)config->mode << (pin * 2U));
 ```
 
@@ -78,7 +78,7 @@ Applicable uniquement en mode OUTPUT et AF — ignoré en INPUT et ANALOG
 ```
 
 ```c
-port->OTYPER &= ~(0x1UL << pin);
+port->OTYPER &= ~((uint32_t)0x1U << pin);
 port->OTYPER |=  ((uint32_t)config->output_type << pin);
 ```
 
@@ -116,8 +116,8 @@ Si BS et BR simultanément à 1 → BS prime (HIGH)
 ```
 
 ```c
-port->BSRR = (0x1UL << pin);           /* SET  — atomique */
-port->BSRR = (0x1UL << (pin + 16U));   /* RESET — atomique */
+port->BSRR = ((uint32_t)0x1U << pin);           /* SET  — atomique */
+port->BSRR = ((uint32_t)0x1U << (pin + 16U));   /* RESET — atomique */
 /* Ne jamais utiliser ODR |= ou ODR &= — non atomique */
 ```
 
@@ -139,10 +139,10 @@ AF7 = USART1/2
 
 ```c
 if (pin <= 7U) {
-    port->AFR[0] &= ~(0xFUL << (pin * 4U));
+    port->AFR[0] &= ~((uint32_t)0xFU << (pin * 4U));
     port->AFR[0] |=  ((uint32_t)config->alternate_function << (pin * 4U));
 } else {
-    port->AFR[1] &= ~(0xFUL << ((pin - 8U) * 4U));
+    port->AFR[1] &= ~((uint32_t)0xFU << ((pin - 8U) * 4U));
     port->AFR[1] |=  ((uint32_t)config->alternate_function << ((pin - 8U) * 4U));
 }
 ```
@@ -156,9 +156,9 @@ bits 15:0 LCKy   verrouille la configuration de la pin y
 
 ```c
 /* Séquence obligatoire — LCKR[15:0] ne doit pas changer */
-__IO uint32_t tmp = (0x1UL << 16U) | (0x1UL << pin);
+__IO uint32_t tmp = ((uint32_t)0x1U << 16U) | ((uint32_t)0x1U << pin);
 port->LCKR = tmp;             /* WR LCKK=1 + LCKy=1 */
-port->LCKR = (0x1UL << pin);  /* WR LCKK=0 + LCKy=1 */
+port->LCKR = ((uint32_t)0x1U << pin);  /* WR LCKK=0 + LCKy=1 */
 port->LCKR = tmp;             /* WR LCKK=1 + LCKy=1 */
 tmp = port->LCKR;             /* RD obligatoire       */
 /* Vérifier bit 16 = 1 pour confirmer le lock */
@@ -199,7 +199,7 @@ Valeur du champ :
 ```c
 uint8_t exti_idx = pin >> 2U;
 uint8_t exti_pos = (pin % 4U) << 2U;
-SYSCFG->EXTICR[exti_idx] &= ~(0xFUL << exti_pos);
+SYSCFG->EXTICR[exti_idx] &= ~((uint32_t)0xFU << exti_pos);
 SYSCFG->EXTICR[exti_idx] |=  ((uint32_t)cr_port_val << exti_pos);
 ```
 
@@ -214,11 +214,11 @@ PR    offset 0x14  pending register       écrire 1 pour clearer
 ```
 
 ```c
-EXTI->IMR  |=  (0x1UL << pin);  /* activer ligne */
-EXTI->IMR  &= ~(0x1UL << pin);  /* désactiver ligne */
-EXTI->RTSR |=  (0x1UL << pin);  /* trigger montant */
-EXTI->FTSR |=  (0x1UL << pin);  /* trigger descendant */
-EXTI->PR    =  (0x1UL << pin);  /* clear pending — écriture directe */
+EXTI->IMR  |=  ((uint32_t)0x1U << pin);  /* activer ligne */
+EXTI->IMR  &= ~((uint32_t)0x1U << pin);  /* désactiver ligne */
+EXTI->RTSR |=  ((uint32_t)0x1U << pin);  /* trigger montant */
+EXTI->FTSR |=  ((uint32_t)0x1U << pin);  /* trigger descendant */
+EXTI->PR    =  ((uint32_t)0x1U << pin);  /* clear pending — écriture directe */
 ```
 
 ## NVIC — Lignes EXTI vers IRQn (PM0214)
