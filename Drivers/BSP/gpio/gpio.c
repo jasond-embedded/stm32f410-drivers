@@ -47,33 +47,33 @@ BSP_GPIO_Status_t BSP_GPIO_Init(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_Config
     else return BSP_GPIO_INVALID;
 
     /* Configure MODER - applies to all modes */
-    port->MODER &= ~(0x3 << (pin * 2));
-    port->MODER |=  (config->mode << (pin * 2));
+    port->MODER &= ~((uint32_t)0x3U << (pin * 2U));
+    port->MODER |=  ((uint32_t)config->mode << (pin * 2U));
 
     /* Output or AF mode -> configure OTYPER, OSPEEDR and eventually AFR */
     if (config->mode == BSP_GPIO_MODE_OUTPUT || config->mode == BSP_GPIO_MODE_AF) {
 
-        port->OTYPER &= ~(0x1 << pin);
-        port->OTYPER |=  (config->output_type << pin);
+        port->OTYPER &= ~((uint32_t)0x1U << pin);
+        port->OTYPER |=  ((uint32_t)config->output_type << pin);
 
-        port->OSPEEDR &= ~(0x3 << (pin * 2));
-        port->OSPEEDR |=  (config->speed << (pin * 2));
+        port->OSPEEDR &= ~((uint32_t)0x3U << (pin * 2U));
+        port->OSPEEDR |=  ((uint32_t)config->speed << (pin * 2U));
 
         /* AF mode : AFRL for pins 0-7, AFRH for pins 8-15 */
         if (config->mode == BSP_GPIO_MODE_AF) {
             if (pin <= 7) {
-                port->AFR[0] &= ~(0xF << (pin * 4));
-                port->AFR[0] |=  (config->alternate_function << (pin * 4));
+                port->AFR[0] &= ~((uint32_t)0xFU << (pin * 4U));
+                port->AFR[0] |=  ((uint32_t)config->alternate_function << (pin * 4U));
             } else {
-                port->AFR[1] &= ~(0xF << ((pin - 8) * 4));
-                port->AFR[1] |=  (config->alternate_function << ((pin - 8) * 4));
+                port->AFR[1] &= ~((uint32_t)0xFU << ((pin - 8U) * 4U));
+                port->AFR[1] |=  ((uint32_t)config->alternate_function << ((pin - 8U) * 4U));
             }
         }
     }
 
     /* Configure PUPDR - applies to all modes */
-    port->PUPDR &= ~(0x3 << (pin * 2));
-    port->PUPDR |=  (config->pull << (pin * 2));
+    port->PUPDR &= ~((uint32_t)0x3U << (pin * 2U));
+    port->PUPDR |=  ((uint32_t)config->pull << (pin * 2U));
 
     return BSP_GPIO_OK;
 }
@@ -85,22 +85,22 @@ BSP_GPIO_Status_t BSP_GPIO_DeInit(GPIO_TypeDef *port, uint8_t pin) {
         return BSP_GPIO_INVALID;
 
     /* Reset the IO pin to Input floating mode (as default) */
-    port->MODER &= ~(0x3U << (pin * 2U));
+    port->MODER &= ~((uint32_t)0x3U << (pin * 2U));
 
     /* Reset the IO pin to Push-Pull output type (as default) */
-    port->OTYPER &= ~(0x1U << pin);
+    port->OTYPER &= ~((uint32_t)0x1U << pin);
 
     /* Reset the IO pin to Low Speed (as default) */
-    port->OSPEEDR &= ~(0x3U << (pin * 2U));
+    port->OSPEEDR &= ~((uint32_t)0x3U << (pin * 2U));
 
     /* Deactivate the Pull-up and the Pull-down resistor (as default) */
-    port->PUPDR &= ~(0x3U << (pin * 2U));
+    port->PUPDR &= ~((uint32_t)0x3U << (pin * 2U));
 
     /* Reset the Alternate function to AF0 (as default) */
     if (pin <= 7) {
-    	port->AFR[0] &= ~(0xF << (pin * 4));
+    	port->AFR[0] &= ~((uint32_t)0xFU << (pin * 4U));
     } else {
-    	port->AFR[1] &= ~(0xF << ((pin - 8) * 4));
+    	port->AFR[1] &= ~((uint32_t)0xFU << ((pin - 8U) * 4U));
     }
 
     /* Note: RCC clock is not disabled here as other pins on this port
@@ -114,7 +114,7 @@ BSP_GPIO_Status_t BSP_GPIO_SetPin(GPIO_TypeDef *port, uint8_t pin) {
     if (pin > 15)
         return BSP_GPIO_INVALID;
 
-    port->BSRR = (0x1 << pin);
+    port->BSRR = ((uint32_t)0x1U << pin);
 
     return BSP_GPIO_OK;
 }
@@ -125,7 +125,7 @@ BSP_GPIO_Status_t BSP_GPIO_ResetPin(GPIO_TypeDef *port, uint8_t pin) {
     if (pin > 15)
         return BSP_GPIO_INVALID;
 
-    port->BSRR = (0x1 << (pin + 16));
+    port->BSRR = ((uint32_t)0x1U << (pin + 16U));
 
     return BSP_GPIO_OK;
 }
@@ -136,7 +136,7 @@ BSP_GPIO_Status_t BSP_GPIO_TogglePin(GPIO_TypeDef *port, uint8_t pin) {
         return BSP_GPIO_ERROR;
     if (pin > 15)
         return BSP_GPIO_INVALID;
-    port->ODR ^= (0x1 << pin);						/* Non atomic*/
+    port->ODR ^= ((uint32_t)0x1U << pin);						/* Non atomic*/
 
     return BSP_GPIO_OK;
 }
@@ -150,7 +150,7 @@ BSP_GPIO_Status_t BSP_GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin, uint8_t *val
     if (value == NULL)
     	return BSP_GPIO_INVALID;
 
-    *value = (port->IDR >> pin) & 0x1;
+    *value = (port->IDR >> pin) & 0x1U;
 
     return BSP_GPIO_OK;
 }
@@ -161,20 +161,20 @@ BSP_GPIO_Status_t BSP_GPIO_LockPin(GPIO_TypeDef *port, uint8_t pin) {
     if (pin > 15)
         return BSP_GPIO_INVALID;
 
-    __IO uint32_t tmp = (0x1UL << 16U) | (0x1UL << pin); // declare it as __IO (volatile) to force the processor not to optimize it and execute each write and read, even if not used.
+    __IO uint32_t tmp = ((uint32_t)0x1U << 16U) | ((uint32_t)0x1U << pin); // declare it as __IO (volatile) to force the processor not to optimize it and execute each write and read, even if not used.
 
     /* WR LCKR[16] = ‘1’ + LCKR[15:0] */
     port->LCKR = tmp;
 
     /* WR LCKR[16] = ‘0’ + LCKR[15:0] */
-    port->LCKR= (0x1UL << pin);
+    port->LCKR= ((uint32_t)0x1U << pin);
 
     /* WR LCKR[16] = ‘1’ + LCKR[15:0] */
     port->LCKR= tmp;
 
     tmp = port->LCKR;
 
-    if ((port->LCKR & (0x1UL << 16U)) != 0) {
+    if ((port->LCKR & ((uint32_t)0x1U << 16U)) != 0) {
     	return BSP_GPIO_OK;
     }
     else return BSP_GPIO_ERROR;
@@ -207,19 +207,19 @@ BSP_GPIO_Status_t BSP_GPIO_EXTI_Config(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO
     else return BSP_GPIO_INVALID;
 
    uint8_t exti_idx = pin >> 2U; // integer division by 4
-   uint8_t exti_pos = (pin % 4) << 2U; // Do not forget that EXTICR[0] includes EXTI0, EXTI1, EXTI2, EXTI3 (4-bits words)
-   SYSCFG->EXTICR[exti_idx] &= ~(0xFU << exti_pos);
-   SYSCFG->EXTICR[exti_idx] |= (cr_port_val << exti_pos);
+   uint8_t exti_pos = (pin % 4U) << 2U; // Do not forget that EXTICR[0] includes EXTI0, EXTI1, EXTI2, EXTI3 (4-bits words)
+   SYSCFG->EXTICR[exti_idx] &= ~((uint32_t)0xFU << exti_pos);
+   SYSCFG->EXTICR[exti_idx] |= ((uint32_t)cr_port_val << exti_pos);
 
     /* EXTI_RTSR / FTSR — Configure trigger*/
-   EXTI->RTSR &= ~(1U << pin);
-   EXTI->FTSR &= ~(1U << pin);
+   EXTI->RTSR &= ~((uint32_t)0x1U << pin);
+   EXTI->FTSR &= ~((uint32_t)0x1U << pin);
 
    if (trigger == BSP_GPIO_IT_RISING || trigger == BSP_GPIO_IT_BOTH) {
-	   EXTI->RTSR |= (1U << pin);
+	   EXTI->RTSR |= ((uint32_t)0x1U << pin);
    }
    if (trigger == BSP_GPIO_IT_FALLING || trigger == BSP_GPIO_IT_BOTH) {
-	   EXTI->FTSR |= (1U << pin);
+	   EXTI->FTSR |= ((uint32_t)0x1U << pin);
    }
    /* If configured as BSP_GPIO_IT_NONE, do nothing since both EXTI_RTSR and EXTI_FTSR were cleared */
 
@@ -248,7 +248,7 @@ BSP_GPIO_Status_t BSP_GPIO_EXTI_Enable(uint8_t pin) {
 		return BSP_GPIO_INVALID;
 
     /* EXTI_IMR — activate the line */
-   EXTI->IMR |= (1U << pin);
+   EXTI->IMR |= ((uint32_t)0x1U << pin);
 
    return BSP_GPIO_OK;
 }
@@ -258,7 +258,7 @@ BSP_GPIO_Status_t BSP_GPIO_EXTI_Disable(uint8_t pin) {
 		return BSP_GPIO_INVALID;
 
     /* EXTI_IMR — activate the line */
-   EXTI->IMR &= ~(1U << pin);
+   EXTI->IMR &= ~((uint32_t)0x1U << pin);
 
    return BSP_GPIO_OK;
 }
@@ -266,8 +266,8 @@ BSP_GPIO_Status_t BSP_GPIO_EXTI_Disable(uint8_t pin) {
 BSP_GPIO_Status_t BSP_GPIO_EXTI_IRQHandler(uint8_t pin) {
 
 	/* EXTI line interrupt detected */
-	if ((EXTI->PR & (1U << pin)) != 0) {
-		EXTI->PR = (1U << pin); // Clear IT
+	if ((EXTI->PR & ((uint32_t)0x1U << pin)) != 0) {
+		EXTI->PR = ((uint32_t)0x1U << pin); // Clear IT
 		BSP_GPIO_EXTI_Callback(pin);
 	}
 	return BSP_GPIO_OK;
