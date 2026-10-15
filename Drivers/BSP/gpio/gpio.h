@@ -53,12 +53,12 @@ typedef enum {
 /*
  * GPIO Pull-up / Pull-down (RM0401 - Section 6.4.4 - GPIOx_PUPDR)
  * Bits 2y:2y+1 PUPDRy[1:0] - Port x configuration bits (y = 0..15)
+ * PUPDR = 0b11 is reserved: not exposed, rejected by BSP_GPIO_Init()
  */
 typedef enum {
     BSP_GPIO_PUPD_NONE      = 0x00,     // PUPDR = 0b00 - No pull-up, pull-down
     BSP_GPIO_PUPD_PULL_UP   = 0x01,     // PUPDR = 0b01 - Pull-up
-    BSP_GPIO_PUPD_PULL_DOWN = 0x02,     // PUPDR = 0b10 - Pull-down
-    BSP_GPIO_PUPD_RESERVED  = 0x03      // PUPDR = 0b11 - Reserved
+    BSP_GPIO_PUPD_PULL_DOWN = 0x02      // PUPDR = 0b10 - Pull-down
 } BSP_GPIO_PuPd_t;
 
 /*

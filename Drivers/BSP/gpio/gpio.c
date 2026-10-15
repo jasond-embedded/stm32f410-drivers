@@ -30,7 +30,7 @@ BSP_GPIO_Status_t BSP_GPIO_Init(GPIO_TypeDef *port, uint8_t pin, BSP_GPIO_Config
 		return BSP_GPIO_INVALID;
 	if (config->speed > BSP_GPIO_SPEED_VERY_HIGH)
 		return BSP_GPIO_INVALID;
-	if (config->pull > BSP_GPIO_PUPD_RESERVED)
+	if (config->pull > BSP_GPIO_PUPD_PULL_DOWN)
 		return BSP_GPIO_INVALID;
 	if (config->alternate_function > BSP_GPIO_AF15)
 		return BSP_GPIO_INVALID;
