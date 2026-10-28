@@ -100,7 +100,8 @@ Applicable uniquement en mode OUTPUT et AF
 0b00 = BSP_GPIO_PUPD_NONE      = 0x00
 0b01 = BSP_GPIO_PUPD_PULL_UP   = 0x01
 0b10 = BSP_GPIO_PUPD_PULL_DOWN = 0x02
-0b11 = BSP_GPIO_PUPD_RESERVED  = 0x03
+0b11 = réservé — volontairement absent de BSP_GPIO_PuPd_t,
+       rejeté par BSP_GPIO_Init() (pull > BSP_GPIO_PUPD_PULL_DOWN → INVALID)
 
 Position : bits (2*pin+1):(2*pin) — 2 bits par pin
 ```
