@@ -11,7 +11,7 @@ qu'un point ouvert est réglé.
 
 | Élément | État |
 |---|---|
-| Driver GPIO | Implémenté et testé sur carte. Revue `reviewer` faite le 2026-10-13 : corrections à faire (section 6). |
+| Driver GPIO | Implémenté et testé sur carte. Revue `reviewer` du 2026-10-13 : corrections en cours sur `fix/gpio-review` (section 6). B1 et B2 commités, **pas encore re-testés sur carte**. |
 | Driver UART | Esquisse non commitée dans `Drivers/BSP/uart/` (uart.h complet, uart.c vide). |
 | Configuration Claude Code | Terminée : CLAUDE.md, settings, hooks, skills, commandes, agents. |
 | README | Publié sur `develop`. |
@@ -20,7 +20,9 @@ qu'un point ouvert est réglé.
 - `main` : branche stable.
 - `develop` : intégration. Tout le travail y est poussé.
 - `feature/uart-driver` : alignée sur `develop`, aucun commit propre pour l'instant.
-- `fix/gpio-review` : à créer depuis `develop` pour les corrections de la revue GPIO.
+- `fix/gpio-review` : corrections de la revue GPIO, poussée sur `origin`.
+  À intégrer dans `develop` (`--no-ff`) une fois le plan terminé et les tests
+  sur carte passés, pas après chaque commit.
 
 ---
 
@@ -42,6 +44,11 @@ qu'un point ouvert est réglé.
 - **Lancement de Claude Code** : depuis Windows Terminal / PowerShell, pas
   depuis la fenêtre Git Bash (mintty), qui fait passer Claude Code en mode
   non interactif.
+- **Commandes à coller dans Git Bash** : courtes, une par ligne (un fichier ou
+  un dossier par `git add`, ou `\` explicite en fin de ligne). Le 2026-10-14,
+  un long `git add` coupé au collage a fait exécuter des `SKILL.md` comme des
+  scripts : `RCC->AHB1ENR` y est lu comme une redirection `>`, ce qui a créé
+  des fichiers vides à la racine (même mécanisme qu'une injection de commande).
 - **Taille actuelle** : Flash ≈ 6,8 Ko / 128 Ko, RAM ≈ 1,6 Ko / 32 Ko.
 
 ---
@@ -75,8 +82,11 @@ qu'un point ouvert est réglé.
 - Conventional Commits, un commit par changement logique.
 - La configuration et les corrections transverses se commitent sur `develop` ;
   le travail d'un driver se fait sur sa branche `feature/...`.
-- Pour mettre à jour une branche feature après un commit sur `develop` :
-  `git merge --ff-only develop` depuis la branche feature.
+- Pour mettre à jour une branche feature/fix après un commit sur `develop` :
+  - si la branche n'a aucun commit propre : `git merge --ff-only develop` ;
+  - sinon (branches divergentes) : `git merge --no-ff develop`. Ne pas
+    rebaser une branche déjà poussée (réécriture, push forcé, hashes cités
+    dans ce document invalidés).
 - Intégration d'une branche dans `develop` : `git merge --no-ff`.
 - Les branches mergées sont supprimées (`git branch -d`).
 - Unity est un submodule (`vendor/Unity`, v2.7.0) : ne jamais le modifier.
@@ -135,14 +145,34 @@ Règles complètes : skill `bsp-conventions`.
 
 **Plan de commits (branche `fix/gpio-review`)**
 ```
-fix(gpio): use unsigned constants in register shifts
-fix(gpio): reject reserved pull configuration
-fix(gpio): restrict GPIOH to PH0 and PH1
-refactor(gpio): write MODER last in BSP_GPIO_Init
-style(gpio): add braces to all if statements
-docs(gpio): add Doxygen and fix F410 alternate function table
-docs: record MISRA-C:2012 deviations
+[fait 5bf396a] fix(gpio): use uint32_t operands in register shifts
+[fait d9e00be] fix(gpio): reject reserved pull configuration
+               fix(gpio): restrict GPIOH to PH0 and PH1
+               fix(gpio): read back AHB1ENR after enabling the port clock (M2)
+               refactor(gpio): write MODER last in BSP_GPIO_Init
+               style(gpio): add braces to all if statements
+               test(gpio): add invalid pull and GPIOH pin cases
+               docs(gpio): add Doxygen and fix F410 alternate function table
+               docs: record MISRA-C:2012 deviations
 ```
+- B1 a couvert tout `gpio.c` (Init, DeInit, Set/Reset/Toggle, ReadPin,
+  LockPin, EXTI) : les décalages déjà « non signés » violaient la Rule 12.2
+  avec la nouvelle convention (§5). Aucun changement fonctionnel.
+- B2 : `BSP_GPIO_PUPD_RESERVED` retiré de `gpio.h` (aucun utilisateur),
+  validation `pull > BSP_GPIO_PUPD_PULL_DOWN`.
+- Les tests sur carte sont à refaire pour **tous** les commits ci-dessus,
+  au plus tard avant l'intégration dans `develop`.
+
+**Constats hors périmètre relevés pendant B1 (à planifier)**
+- `ReadPin` : `*value = … & 0x1U` affecte un `uint32_t` à un `uint8_t`
+  (Rule 10.3).
+- `EXTI_IRQHandler` ne valide pas `pin` : `0x1U << pin` est un UB si
+  `pin >= 32` (règle CLAUDE.md sur la validation des paramètres).
+- Comparaisons sans suffixe `U` : `pin > 15`, `pin <= 7`, `!= 0`,
+  `priority > 15`, chaîne `pin == 0..4` de l'aiguillage IRQn.
+- Commentaires `//` dans `gpio.c` et `gpio.h`.
+- `constParameterPointer` (cppcheck) : `config` (Init), `port` (ReadPin,
+  EXTI_Config) à passer en `const` — modifie le header public.
 
 ---
 
