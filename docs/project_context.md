@@ -148,10 +148,10 @@ Règles complètes : skill `bsp-conventions`.
 [fait 5bf396a] fix(gpio): use uint32_t operands in register shifts
 [fait d9e00be] fix(gpio): reject reserved pull configuration
                fix(gpio): restrict GPIOH to PH0 and PH1
+               test(gpio): add invalid pull and GPIOH pin cases
                fix(gpio): read back AHB1ENR after enabling the port clock (M2)
                refactor(gpio): write MODER last in BSP_GPIO_Init
                style(gpio): add braces to all if statements
-               test(gpio): add invalid pull and GPIOH pin cases
                docs(gpio): add Doxygen and fix F410 alternate function table
                docs: record MISRA-C:2012 deviations
 ```
@@ -162,6 +162,35 @@ Règles complètes : skill `bsp-conventions`.
   validation `pull > BSP_GPIO_PUPD_PULL_DOWN`.
 - Les tests sur carte sont à refaire pour **tous** les commits ci-dessus,
   au plus tard avant l'intégration dans `develop`.
+- Le commit de test suit immédiatement M5 (décidé le 2026-10-28) : chaque
+  correction est couverte tout de suite. Il couvre aussi B2 (pull `0b11`).
+
+**M5 (GPIOH) — en cours, décisions du 2026-10-28**
+- Validation dans **toutes** les fonctions publiques qui prennent
+  `(port, pin)` (Init, DeInit, Set/Reset/Toggle, ReadPin, LockPin,
+  EXTI_Config), pas seulement dans Init. Raison : un `OK` pour une broche
+  inexistante fait croire qu'elle est configurée (débogage coûteux, par
+  exemple une broche préparée pour un autre driver).
+- Code de retour : `BSP_GPIO_INVALID` (paramètre invalide, pas une erreur
+  matérielle).
+- Doxygen `@note` de la restriction : dans le commit `docs(gpio)`.
+- **Ouvert** : vérification dans une fonction `static` interne
+  (`gpio_is_pin_available()`, appelée avant tout accès registre) ou
+  condition ajoutée dans la chaîne `if` d'activation RCC de Init.
+  Recommandation de l'assistant : fonction `static` (une seule
+  implémentation pour toutes les fonctions, causes d'erreur distinctes,
+  chaîne RCC réservée à l'activation de l'horloge, retouchée par M2).
+- **Ouvert** : confirmer PH0/PH1 seules sur LQFP64 dans DS11144 Rev 7,
+  Table 9 (page 34). L'information ne vient pas du RM0401 (registres
+  génériques à 16 broches) mais de la datasheet.
+
+**M2 — source trouvée**
+- ES0325 Rev 7, page 9, « Delay after an RCC peripheral clock enabling » :
+  délai jusqu'à 2 cycles AHB pour un périphérique AHB (GPIO). Contournements
+  proposés : `DSB`, `NOP`, ou lecture factice du registre juste après
+  l'activation (solution retenue).
+- Numéro de section à lire dans le PDF : le texte extrait donne 2.2.7 dans
+  le corps et le sommaire, 2.5.4 dans le tableau récapitulatif.
 
 **Constats hors périmètre relevés pendant B1 (à planifier)**
 - `ReadPin` : `*value = … & 0x1U` affecte un `uint32_t` à un `uint8_t`
@@ -203,7 +232,13 @@ Règles complètes : skill `bsp-conventions`.
 - Vérifier que la skill `uart-registers` est alignée avec la section 7
   (nom `s_apb_presc_shift`, méthode d'effacement de TC).
 - `main.c` : le bouton B1 (PC13, actif bas, pull-up externe sur la carte)
-  est configuré en `PULL_DOWN` + front montant. Vérifier le montage réel.
+  est configuré en `PULL_DOWN` + front montant. Vérifier le montage réel
+  (UM1724 Rev 17, mot-clé `Push-buttons`). Voir aussi l'erratum ES0325
+  Rev 7 « PC13 signal transitions disturb LSE » (page 10).
+- `pdftoppm` absent : impossible de lire les pages des PDF de référence
+  (tableaux, figures). Installation MSYS2 bloquée par une mise à jour
+  partielle → `pacman -Syu` puis `pacman -S mingw-w64-ucrt-x86_64-poppler`,
+  dans un terminal MSYS2 UCRT64 (traité dans la session « config »).
 - Choisir une licence pour le dépôt (README : *To be defined*).
 - Tests Unity côté PC (`Tests/host/`) : approche de simulation des registres
   à définir.
