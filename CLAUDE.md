@@ -93,3 +93,11 @@ Contenu : actions effectuées, propositions, décisions, améliorations possible
   avant toute réponse qui en dépend.
 - En fin de session, proposer la mise à jour de docs/project_context.md
   (décisions prises, points ouverts réglés).
+  
+  ## Documentation de référence
+- Index : docs/reference/INDEX.md. Chercher d'abord avec Grep dans docs/reference/txt/,
+  puis lire le PDF uniquement aux pages trouvées si besoin pour des objets au format 
+  difficilement lisible en format .txt (tableaux, figures).
+- Ne jamais lire un PDF de référence en entier.
+- Toute affirmation sur un registre cite : document, révision, section.
+  Si la source est introuvable, le dire plutôt que répondre de mémoire.
