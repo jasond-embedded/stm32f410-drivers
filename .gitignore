@@ -27,3 +27,6 @@ build.log
 
 #Fichiers de récupération
 .backup/
+
+docs/reference/*
+!docs/reference/INDEX.md
